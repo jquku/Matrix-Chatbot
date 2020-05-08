@@ -74,14 +74,12 @@ async def message_cb(room, event):
         #    )    + str("room timestamp: " + str(event.server_timestamp)) + " type: " + str(type(event))
         #)
         #print("                     ")
-        #new message
         if check_if_room_is_existing(room_id) == False:
             create_new_room(room_id, room_display_name, student_name)
-            #print("New room added")
+
         if check_if_student_is_existing(student_name) == False:
             create_new_student(student_name, "OS", "default")
-            #print("New student added")
-        #print("new message added")
+
         global lastSender
         global lastResponse
         #print("LAST SENDER: " + str(lastSender))

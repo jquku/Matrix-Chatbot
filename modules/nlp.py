@@ -6,7 +6,6 @@ from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from autocorrect import Speller
 
-
 sys.path.append("./../")
 #nltk.download()
 
@@ -21,8 +20,16 @@ from services.database_service import data_basis_query, get_number_of_links_to_b
 #6. Remove spelling errors
 
 def strategy(message, user):
-#    print("original message: " + message)
     lowercased = lowercase(message)
+
+    help = check_if_help_called(message)
+
+    if help != "":
+        final_response = []
+        final_response.append(lowercased)
+        final_response.append("")
+        final_response.append(help)
+        return final_response
 
     options_called = check_if_options_called(lowercased, user)
     if options_called == True:
@@ -31,14 +38,14 @@ def strategy(message, user):
         final_response.append("")
         final_response.append("")
         return final_response
-    print("options called: " + str(type(options_called)))
+
     if type(options_called) is tuple:
-        #print("options_called: " + str(options_called))
         final_response = []
         final_response.append(lowercased)
         final_response.append(options_called[0])
         final_response.append(options_called[0])
         return final_response
+
     if type(options_called) == str:
         final_response = []
         final_response.append(lowercased)
@@ -65,8 +72,7 @@ def strategy(message, user):
 #    print("final message: " + str(final_message))
     links = compare_message_with_data_basis(final_message)
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
-    #if type(links) is list:
-    #    links = list_to_string(links)
+
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
     response = build_response(greeting_involved, links, goodbyes_involved, user)
     final_response = []
@@ -84,28 +90,34 @@ def list_to_string(links):
 def check_if_options_called(message, user):
     #get more links
     #set number of links to be shown
-    if "links = " in message:
-        #print("links")
+    if "links = " in message or "link = " in message or "links= " in message or "link=" in message:
+
         number = re.findall(r'\d+', message)
+
         if len(number) == 1:
             number = str(number[0])
-            #print("number: " + str(number))
             set_number_of_links_to_be_shown(user, number)
             return True
 
     if "show more" in message or "zeig mehr" in message:
         links_last_message = get_next_links(user, message)
-        print("SHOW MORE: " + str(links_last_message))
-        #links_last_message = ''.join(links_last_message)
         return links_last_message
 
     if "show all" in message or "zeig alles" in message:
         links_last_message = get_concerning_links(user)
-        #links_last_message = ''.join(links_last_message)
-        #print("SHOW ALL: " + links_last_message)
         return links_last_message
+
     return False
 
+def check_if_help_called(message):
+
+    help_phrases = ['help', 'i need help', 'help me', 'hilf mir', 'hilfe']
+    standard = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query."
+    for i in range(0, len(help_phrases)):
+        current = help_phrases[i]
+        if current in message:
+            return standard
+    return ""
 
 #lowercasing every letter in string
 def lowercase(text):
@@ -114,7 +126,7 @@ def lowercase(text):
 
 #remove special characters
 def noise_removal(text):
-    #every character besieds letters (a-z)
+    #every character besieds letters (a-z) and numbers
     text = re.sub(r'([^a-zA-Z0-9\s]+?)', '', text)
     return text
 
@@ -197,7 +209,7 @@ def build_response(greeting_involved, links, goodbyes_involved, user):
     default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
     number_of_links = len(links)
     if greeting_involved == True:
-        response = "Hi. "
+        response = "Hi "
     if number_of_links > 0:
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
         print("how many links to show: " + how_many_links_to_show)

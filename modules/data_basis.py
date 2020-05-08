@@ -41,8 +41,8 @@ def add_data_basis():
             url = ul.find('a').get('href')    #first link is taken
             url = url_prefix + url
 
-
         else:
+            
             topic = link.find('a').text
             topic = topic.lower()
             topic = noise_removal(topic)
