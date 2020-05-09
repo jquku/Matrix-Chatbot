@@ -102,14 +102,10 @@ def check_if_options_called(message, user):
 
     if "show more" in message or "zeig mehr" in message:
         links_last_message = get_next_links(user, message)
-        if len(links_last_message) == 0:    #no result found then show the message before
-                links_last_message = get_next_links(user, message)
         return links_last_message
 
     if "show all" in message or "zeig alles" in message:
         links_last_message = get_concerning_links(user)
-        if len(links_last_message): #no result found then show the message before
-            links_last_message = get_concerning_links(user)
         return links_last_message
 
     return False

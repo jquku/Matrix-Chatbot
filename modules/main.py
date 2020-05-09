@@ -49,9 +49,6 @@ async def sendMessage(room_id, response, student_name):
     lastResponse = response
     lastSender = "riot_chatbot"
 
-    #print("lastSender after sending: " + str(lastSender))
-    #print("lastResponse after sending: " + str(lastResponse))
-
 async def message_cb(room, event):
     room_id = str(room.room_id)
     room_display_name = room.display_name
@@ -82,19 +79,10 @@ async def message_cb(room, event):
 
         global lastSender
         global lastResponse
-        #print("LAST SENDER: " + str(lastSender))
-        #print("CURRENT SENDER: " + str(student_name))
-        #print("LAST RESPONSE: " + str(lastResponse))
-        #print("CURRENT RESPONSE: " + str(message_body))
-        #print("lastSender before sending: " + str(lastSender) + " CURRENT: " + str(student_name))
-        #print("lastResponse before sending: " + str(lastResponse) + " CURRENT: " + str(message_body))
+
         if str(lastSender) != str(student_name) or str(lastResponse) != str(message_body):
-            #if lastSender != student_name:
-                #print("Sender ungleich")
-            #if lastResponse != message_body:
-                #print("Response ungleich")
+
             response = strategy(message_body, student_name)
-            #print("RESPONSE " + str(len(response[2])) + " TYPE: " + str(type(response[2])))
             create_new_message(student_name, message_body, response[0], response[1], response[2])
             if len(response[2]) > 0:
                 await sendMessage(room_id, response[2], student_name)
