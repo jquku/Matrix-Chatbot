@@ -78,7 +78,7 @@ async def message_cb(room, event):
             create_new_room(room_id, room_display_name, student_name)
 
         if check_if_student_is_existing(student_name) == False:
-            create_new_student(student_name, "OS", "default")
+            create_new_student(student_name, "OS", 2)   #default: show 2 links
 
         global lastSender
         global lastResponse
@@ -104,7 +104,7 @@ async def message_cb(room, event):
 
 async def main():
     create_tables()
-    #add_data_basis()
+    add_data_basis()
     #print('\n'.join(sys.path))
     #await client.register("chatbot:matrix.org", "test123", "")
     await client.login("chatbot123")

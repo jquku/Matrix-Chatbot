@@ -1,7 +1,6 @@
 def sort_links_by_matching(links, keywords):
-    print("links sorting: " + str(links))
-    links = list(dict.fromkeys(links))  #remove doubles by transforming into dict
-    #print("links: " + str(links))
+
+    links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
     only_topic = []
     for i in range(0, len(links)):
         only_topic.append(links[i][0])

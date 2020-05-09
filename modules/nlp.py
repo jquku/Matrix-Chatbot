@@ -54,7 +54,7 @@ def strategy(message, user):
         return final_response
 #    print("lowercase message " + lowercased)
     remove_noises = noise_removal(lowercased)
-#    print("no special characters: " + remove_noises)
+    print("no special characters: " + remove_noises)
     tokens = tokenization(remove_noises)
 
     after_lemmitation = lemmatization(tokens)
@@ -71,7 +71,7 @@ def strategy(message, user):
     final_message = remove_spelling_errors(without_stop_words)
 #    print("final message: " + str(final_message))
     links = compare_message_with_data_basis(final_message)
-    #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
+    print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
 
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
     response = build_response(greeting_involved, links, goodbyes_involved, user)
@@ -95,16 +95,21 @@ def check_if_options_called(message, user):
         number = re.findall(r'\d+', message)
 
         if len(number) == 1:
-            number = str(number[0])
+            number = number[0]
+            #number = str(number[0])
             set_number_of_links_to_be_shown(user, number)
             return True
 
     if "show more" in message or "zeig mehr" in message:
         links_last_message = get_next_links(user, message)
+        if len(links_last_message) == 0:    #no result found then show the message before
+                links_last_message = get_next_links(user, message)
         return links_last_message
 
     if "show all" in message or "zeig alles" in message:
         links_last_message = get_concerning_links(user)
+        if len(links_last_message): #no result found then show the message before
+            links_last_message = get_concerning_links(user)
         return links_last_message
 
     return False
@@ -213,8 +218,6 @@ def build_response(greeting_involved, links, goodbyes_involved, user):
     if number_of_links > 0:
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
         print("how many links to show: " + how_many_links_to_show)
-        if how_many_links_to_show == "default":
-            how_many_links_to_show = 3
         how_many_links_to_show = int(how_many_links_to_show)
         response = response + "I've found " + str(number_of_links) + " results. "
         for i in range(0, number_of_links):

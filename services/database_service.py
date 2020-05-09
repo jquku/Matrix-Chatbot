@@ -78,6 +78,7 @@ def data_basis_query(keywords):
         query = query + " OR topic LIKE '%" + keywords[i] + "%'"
     cursor.execute(query)
     links = cursor.fetchall()    #returns tuple
+    print("LINKS: " + str(links))
     cursor.close()
     connection.close()
     return sort_links_by_matching(links, keywords)
@@ -107,11 +108,12 @@ def set_number_of_links_to_be_shown(user, number):
 def get_concerning_links(user):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("SELECT all_links FROM message WHERE student_name = %s", [user])
+    cursor.execute("SELECT all_links FROM message WHERE student_name = %s and all_links != '' order by id desc limit 1", [user])
     fitting_links = cursor.fetchall()
-    #print("fitting links: " + str(fitting_links))
+    print("fitting links: " + str(fitting_links))
     number_of_links = len(fitting_links)
     result = fitting_links[number_of_links-1] #get all_links from last message
+    print("RESULT: " + str(result))
     cursor.close()
     connection.close()
     return result
@@ -146,6 +148,6 @@ def get_next_links(user, message):
 
     for j in range(0, int(number_of_links_to_be_shown)):
         print("current elemnt: " + str(links_in_list[j]))
-        output = output + "\n" + "\n" + links_in_list[j]
+        output = output + links_in_list[j] + "\n" + "\n"
     print("output: " + str(output))
     return output
