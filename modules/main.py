@@ -16,24 +16,20 @@ from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
 
 from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
-from nlp import strategy
-from data_basis import add_data_basis
-#from register_user import register_new_user
+from nlp import language_processing
+from response_generation import generate_response
+from message_evaluation import evaluate_message
+from index_evaluation import add_data_basis
 
 lastResponse = ""   #global variables
 lastSender = ""
 
-#client = AsyncClient("http://localhost:8008", "@chatbot:quade.org")
-#client = AsyncClient("https://matrix.org", "@jquku:matrix.org")
 client = AsyncClient("https://matrix.org", "@riot_chatbot:matrix.org")
 
 
 async def sendMessage(room_id, response, student_name):
     print("RESPONSE: " + str(response))
 
-    #response_string = ""    #response comes as a list, build a string
-    #for i in range(0, len(response)):
-    #    response_string = response_string + response[i] + " "
 
     await client.room_send(
         room_id=room_id,
@@ -64,13 +60,7 @@ async def message_cb(room, event):
         print("old")
     else:
         print("NEW MESSAGE")
-        #print("room id: " + str(room_id))
-        #print(
-        #    "Message received for room {} | {}: {}".format(
-        #        room.display_name, room.user_name(event.sender), event.body
-        #    )    + str("room timestamp: " + str(event.server_timestamp)) + " type: " + str(type(event))
-        #)
-        #print("                     ")
+
         if check_if_room_is_existing(room_id) == False:
             create_new_room(room_id, room_display_name, student_name)
 
@@ -82,36 +72,18 @@ async def message_cb(room, event):
 
         if str(lastSender) != str(student_name) or str(lastResponse) != str(message_body):
 
-            response = strategy(message_body, student_name)
-            create_new_message(student_name, message_body, response[0], response[1], response[2])
-            if len(response[2]) > 0:
-                await sendMessage(room_id, response[2], student_name)
+            processed_message = language_processing(message_body)
+            evaluation = evaluate_message(student_name, processed_message)
+            response = generate_response(student_name, evaluation, message_body)
 
-        #await client.close()
-        #sys.exit(0)
+            if response != "":
+                await sendMessage(room_id, response, student_name)
 
 async def main():
     create_tables()
-    add_data_basis()
-    #print('\n'.join(sys.path))
-    #await client.register("chatbot:matrix.org", "test123", "")
     await client.login("chatbot123")
-    #await client.login("chatbot")
     print("after login")
-    #await register_new_user()
-    #user = "chatbot:matrix.org"
-    #password = "chatbot123454321"
-    #device_name = ""
-    #device_id = ""
-    #nio = Api()
-    #await Api.register(user, password, device_name, device_id)
-    #await self.regiter(user, password, device_name, device_id)
 
-    #client.register(user, password)
-    #await Api.register(user, password, device_name)
-
-    #strategy("Hello guys,    this is a testmessage about virtual clock memory. We also have ---...,,,:::::89")
-    #await client.sync(timeout=5000)
     client.add_event_callback(message_cb, RoomMessageText)
     await client.sync_forever(timeout=30000) #always sync with server
 

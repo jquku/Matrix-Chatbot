@@ -1,7 +1,5 @@
 import sys
 
-from .sort_links import sort_links_by_matching
-
 import psycopg2
 
 
@@ -60,10 +58,10 @@ def create_new_message(student_name, body, information_extracted, all_links, res
     cursor.close()
     connection.close()
 
-def add_data_basis_entry(module, topic, url):
+def add_data_basis_entry(module, original, topic, url):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO data_basis(module, topic, link) VALUES (%s, %s, %s)", [module, topic, url])
+    cursor.execute("INSERT INTO data_basis(module, original, topic, link) VALUES (%s, %s, %s, %s)", [module, original, topic, url])
     connection.commit()
     cursor.close()
     connection.close()
@@ -80,7 +78,7 @@ def data_basis_query(keywords):
     links = cursor.fetchall()    #returns tuple
     cursor.close()
     connection.close()
-    return sort_links_by_matching(links, keywords)
+    return links
 
 def get_number_of_links_to_be_shown(user):
     connection = connect_to_database()
@@ -112,7 +110,7 @@ def get_concerning_links(user):
     connection.close()
     return result
 
-def get_next_links(user, message):
+def get_next_links(user):
     connection = connect_to_database()
     cursor = connection.cursor()
     all_links = get_concerning_links(user)
@@ -135,4 +133,47 @@ def get_next_links(user, message):
 
     for j in range(0, int(number_of_links_to_be_shown)):
         output = output + links_in_list[j] + "\n" + "\n"
+    return output
+
+def get_original_topic(topic):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT original, module FROM data_basis WHERE topic = %s", [topic])
+    original = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return original
+
+def check_if_topic_already_in_statistic(topic):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT module FROM statistics WHERE topic = %s", [topic])
+    module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return module
+
+def create_new_statistic_entry(module, topic):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO statistics(module, topic, questioned) VALUES (%s, %s, %s)", [module, topic, 1])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def increment_statistic_topic_counter(module, topic):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE statistics SET questioned = questioned + 1 WHERE module = %s and topic = %s", [module, topic])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_stats(module):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT topic FROM statistics WHERE module LIKE '%" + module + "%'" + "order by questioned desc")
+    output = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return output
