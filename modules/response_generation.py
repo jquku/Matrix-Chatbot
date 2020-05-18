@@ -41,19 +41,19 @@ def generate_response(user, message, original_message):
     #step 4: check if show more or show all is called
     if show_more == True:
         links_last_message_more = get_next_links(user)
-        print("SHOW MORE TYPE: " + str(type(links_last_message_more)))
+        #print("SHOW MORE TYPE: " + str(type(links_last_message_more)))
         response = response + links_last_message_more
 
     if show_all == True:
         links_last_message_all = get_concerning_links(user)
         #TUPLE
-        print("SHOW ALL TYPE: " + str(type(links_last_message_all)))
+        #print("SHOW ALL TYPE: " + str(type(links_last_message_all)))
         response = response + links_last_message_all[0]
 
     #step 5: add links if necessary
     if number_of_links_found > 0:
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
-        print("how many links to show: " + how_many_links_to_show)
+        #print("how many links to show: " + how_many_links_to_show)
         how_many_links_to_show = int(how_many_links_to_show)
         response = response + "I've found " + str(number_of_links_found) + " results. "
         for i in range(0, number_of_links_found):
@@ -61,7 +61,7 @@ def generate_response(user, message, original_message):
                 response = response + links[i] +  "\n" +  "\n"
             else:
                 break
-    print("CURRENT RESPONSE: " + str(response))
+    #print("CURRENT RESPONSE: " + str(response))
     #step 6: add goodbye if necessary
     if goodbyes == True:
         response = response + "Bye!"
@@ -70,12 +70,12 @@ def generate_response(user, message, original_message):
     if response == "":
         default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
         response = default_answer
-    print("LINKS TYPE: " + str(type(links)))
+    #print("LINKS TYPE: " + str(type(links)))
 
     all_links_db = list_to_string(links)
     if all_links_db == "":
         if show_more == True:
-            all_links_db = links_last_message_more
+            all_links_db = get_concerning_links(user)  #wrong
         if show_all == True:
             all_links_db = links_last_message_all[0]
     create_new_message(user, original_message, lowercase_only, all_links_db, response)

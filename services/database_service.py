@@ -1,4 +1,5 @@
 import sys
+import re
 
 import psycopg2
 
@@ -114,19 +115,43 @@ def get_next_links(user):
     connection = connect_to_database()
     cursor = connection.cursor()
     all_links = get_concerning_links(user)
+    #print("all_links: " + str(all_links))
     number_of_links_to_be_shown = get_number_of_links_to_be_shown(user)
+    #print("NUMBER OF LINKS TO SHOW: " + str(number_of_links_to_be_shown))
     cursor.execute("SELECT response FROM message WHERE student_name = %s and all_links != '' order by id desc limit 1", [user])
-    last_message = cursor.fetchall()
-    last_message = str(last_message)
+    last_message = cursor.fetchone()
+    #print("QUERY RESULT RESULT RESULT: " + str(last_message) + str(type(last_message)) + str(len(last_message)))
+    last_message = str(last_message[0])
+    last_message = last_message.replace("\n\n", " ")
+    #print("2222222222222222: " + str(last_message))
+    last_message = last_message.split()
+    #last_message = [x.strip() for x in last_message.split('\n\n')]
+    #last_message = last_message.split()
+    #print("QUERY RESULT RESULT RESULT NEW NEW NEW: " + str(last_message))
     all_links = list(all_links)
     links_in_list = all_links[0].split()
+    #print("LINKS IN LIST LINKS IN LIST LINKS IN LIST: " + str(links_in_list))
     highest_index = 0
+    #print("len(links_in_list:) " + str(len(links_in_list)))
     for i in range(0, len(links_in_list)):
+        #print("i: " + str(i))
         current = links_in_list[i]
-        if current in last_message:
+        #print("current: " + str(current))
+        #if current in last_message:
+        element_found = False
+        for k in range(0, len(last_message)):
+            #print("LAST MESSAGE[k]: " + str(last_message[k]) + " CURRENT: " + str(current))
+            if str(last_message[k]) == str(current):
+                element_found = True
+        if element_found == True:
+            #print("current in message")
             if i >= highest_index:
                 highest_index = i + 1
+                #highest_index = i
+    #print("new highest index: " + str(highest_index))
+    #print("PRE CUTTING: " + str(links_in_list) + str(len(links_in_list)))
     links_in_list = links_in_list[highest_index:]
+    #print("LINKS IN LIST LINKS IN LIST LINKS IN LIST 2: " + str(links_in_list))
     if int(number_of_links_to_be_shown) > len(links_in_list):
         number_of_links_to_be_shown = len(links_in_list)
     output = ""
