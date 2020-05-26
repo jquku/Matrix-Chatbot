@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("./../")
 
-from services.database_service import add_data_basis_entry
+from services.database_service import add_data_basis_entry, add_new_module
 from nlp import language_processing
 
 #index is used for the data basis; topics need to be transfered into db
@@ -25,6 +25,7 @@ def list_to_string(topic):
 def add_data_basis():
 
     module = "Operating Systems (OS)"
+    module = module.lower()
     url = "https://oer.gitlab.io/OS/index-terms.html"
     url_prefix = "https://oer.gitlab.io/OS/"
     response = requests.get(url)
@@ -69,6 +70,7 @@ def add_data_basis():
             url = url_prefix + url
 
         add_data_basis_entry(module, topic_original, topic, url)
+    add_new_module(module, url)
 
 
 if __name__ == '__main__':

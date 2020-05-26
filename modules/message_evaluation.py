@@ -3,7 +3,7 @@ import re
 
 sys.path.append("./../")
 
-from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links
+from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_all_modules
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
 
 
@@ -11,6 +11,7 @@ def evaluate_message(user, message):
 
     lowercase_only = message[0]
     standardized_message = message[1]
+    only_tokens = message[2]
 
     help = help_called(lowercase_only)
     number_of_links = change_standard_number_of_links_called(user, lowercase_only)
@@ -18,6 +19,7 @@ def evaluate_message(user, message):
     show_all = show_all_called(lowercase_only)
     greetings = greetings_involved(standardized_message)
     goodbyes = goodbyes_involved(standardized_message)
+    stats_called_result = stats_called(only_tokens)
 
     print("HELP: " + str(help))
     print("CHANGE NUMBER OF LINKS: " + str(number_of_links))
@@ -31,7 +33,7 @@ def evaluate_message(user, message):
     links = sort_links_by_matching(links, standardized_message)
 
     print("LINKS AFTER AFTERAFTER AFTER: " + str(type(links)) + str(links) + str(len(links)))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, links)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, links)
     return evaluation
 
 def help_called(message):
@@ -99,6 +101,24 @@ def goodbyes_involved(tokens):
             return True
     return False
 
+def stats_called(tokens):
+    stats_called = False
+    phrases = ["statistics", "stat", "stats", "analytics", "statistik","analytik", "statistiken"]
+    modules = get_all_modules()
+    module = ""
+    for i in range(0, len(tokens)):
+        if tokens[i] in phrases:
+            stats_called = True
+        #module_found = any(tokens[i] in string for string in modules)
+        module_found = [string for string in modules if tokens[i] in string]
+        if len(module_found) > 0:
+            module = module_found[0]
+    print(str(stats_called) + str(module))
+    if stats_called == True and module != "":
+        return module
+    else:
+        return False
+
 def compare_message_with_data_basis(message):
     link = data_basis_query(message)
     return link
@@ -150,7 +170,6 @@ def sort_links_by_matching(links, keywords):
                     create_new_statistic_entry(module, original)
                 else:
                     increment_statistic_topic_counter(module, original)
-                #print("STATS STATS STATS: " + str(get_stats(module)))
                 #if len(topic_in_statistic) == "":
                 #    create_new_statistic_entry()
                 #if topic_in_statistic == True:

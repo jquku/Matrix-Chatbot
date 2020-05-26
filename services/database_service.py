@@ -67,6 +67,14 @@ def add_data_basis_entry(module, original, topic, url):
     cursor.close()
     connection.close()
 
+def add_new_module(name, source):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO module(name, source) VALUES (%s, %s)", [name, source])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
 def data_basis_query(keywords):
     if len(keywords) == 0:
         return []
@@ -194,10 +202,24 @@ def increment_statistic_topic_counter(module, topic):
     cursor.close()
     connection.close()
 
+def get_all_modules():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM module")
+    output = cursor.fetchall()
+
+    new_output = []     #clean up original output
+    for i in range(0, len(output)):
+        new_output.append(output[i][0])
+
+    cursor.close()
+    connection.close()
+    return new_output
+
 def get_stats(module):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("SELECT topic FROM statistics WHERE module LIKE '%" + module + "%'" + "order by questioned desc")
+    cursor.execute("SELECT topic, questioned FROM statistics WHERE module LIKE '%" + module + "%'" + "order by questioned desc")
     output = cursor.fetchall()
     cursor.close()
     connection.close()

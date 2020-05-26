@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("./../")
 
-from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links
+from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats
 from services.database_service import create_new_message
 
 def generate_response(user, message, original_message):
@@ -15,7 +15,8 @@ def generate_response(user, message, original_message):
     show_all = message[5]
     greetings = message[6]
     goodbyes = message[7]
-    links = message[8]
+    stats_called = message[8]
+    links = message[9]
 
     response = ""
     number_of_links_found = len(links)
@@ -38,7 +39,17 @@ def generate_response(user, message, original_message):
     if greetings == True:
         response = "Hi! "
 
-    #step 4: check if show more or show all is called
+    #step 4: return statistics if called
+    if stats_called != False:
+        print("STATS STATS STATS  STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS")
+        output_stats = get_stats(stats_called)  #returns sorted list of topics + questions
+        response = response + "Here are the most requested topics. \n \n"
+        for j in range(0, 5):
+            response = response + str(output_stats[j][0]) + " was requested " + str(output_stats[j][1]) + " times. \n"
+        #print("STATS STATS STATS: " + str(output_stats) + str(output_stats[0][0]) + str(type(output_stats)) + str(len(output_stats[0])))
+        return response
+
+    #step 5: check if show more or show all is called
     if show_more == True:
         links_last_message_more = get_next_links(user)
         #print("SHOW MORE TYPE: " + str(type(links_last_message_more)))
@@ -50,7 +61,7 @@ def generate_response(user, message, original_message):
         #print("SHOW ALL TYPE: " + str(type(links_last_message_all)))
         response = response + links_last_message_all[0]
 
-    #step 5: add links if necessary
+    #step 6: add links if necessary
     if number_of_links_found > 0:
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
         #print("how many links to show: " + how_many_links_to_show)
@@ -62,11 +73,11 @@ def generate_response(user, message, original_message):
             else:
                 break
     #print("CURRENT RESPONSE: " + str(response))
-    #step 6: add goodbye if necessary
+    #step 7: add goodbye if necessary
     if goodbyes == True:
         response = response + "Bye!"
 
-    #step 7: check if default answer is necessary
+    #step 8: check if default answer is necessary
     if response == "":
         default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
         response = default_answer

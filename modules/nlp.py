@@ -33,7 +33,7 @@ def language_processing(message):
     final_message = remove_spelling_errors(without_stop_words)
     #print("lowercased: " + str(lowercased))
     #print("final FINAL FINAL FINAL message: " + str(final_message) + str(type(final_message)))
-    return lowercased, final_message    #returns tuple
+    return lowercased, final_message, tokens    #returns tuple
 
 #lowercasing every letter in string
 def lowercase(text):
