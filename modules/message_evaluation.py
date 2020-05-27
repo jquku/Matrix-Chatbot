@@ -20,7 +20,7 @@ def evaluate_message(user, message):
     greetings = greetings_involved(standardized_message)
     goodbyes = goodbyes_involved(standardized_message)
     stats_called_result = stats_called(only_tokens)
-    message_contains_yes_or_no = check_if_message_contains_yes_or_no(standardized_message)
+    message_contains_yes_or_no = check_if_message_contains_yes_or_no(only_tokens)
 
     print("HELP: " + str(help))
     print("CHANGE NUMBER OF LINKS: " + str(number_of_links))
@@ -125,8 +125,10 @@ def check_if_message_contains_yes_or_no(tokens):
     phrases_no = ["no", "not at all", "nah", "ne", "nein"]
     for i in range(0, len(tokens)):
         if tokens[i] in phrases_yes:
+            print("PHRASES YES")
             return 1
         if tokens[i] in phrases_no:
+            print("PHRASES NO")
             return -1
     return False
 

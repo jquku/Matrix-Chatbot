@@ -70,7 +70,7 @@ def add_data_basis_entry(module, original, topic, url):
 def add_new_module(name, source):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO module(name, source, satisfaction) VALUES (%s, %s, %s)", [name, source, 0])
+    cursor.execute("INSERT INTO module(name, source, satisfaction, feedback_given) VALUES (%s, %s, %s, %s)", [name, source, 0, 0])
     connection.commit()
     cursor.close()
     connection.close()
@@ -255,7 +255,7 @@ def get_last_message(user):
 def update_modul_satisfaction(module, factor):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("UPDATE module SET satisfaction = satisfaction + %s WHERE name = %s", [factor, module])
+    cursor.execute("UPDATE module SET satisfaction = satisfaction + %s, feedback_given = feedback_given + 1 WHERE name = %s", [factor, module])
     connection.commit()
     cursor.close()
     connection.close()
