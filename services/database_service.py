@@ -46,7 +46,7 @@ def create_new_room(room_id, room_name, students):
 def create_new_student(name, last_module, links_preferred):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO student(name, last_module, links_preferred) VALUES (%s, %s, %s)", [name, last_module, links_preferred])
+    cursor.execute("INSERT INTO student(name, last_module, links_preferred, links_counter) VALUES (%s, %s, %s, %s)", [name, last_module, links_preferred, 0])
     connection.commit()
     cursor.close()
     connection.close()
@@ -70,7 +70,7 @@ def add_data_basis_entry(module, original, topic, url):
 def add_new_module(name, source):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO module(name, source) VALUES (%s, %s)", [name, source])
+    cursor.execute("INSERT INTO module(name, source, satisfaction) VALUES (%s, %s, %s)", [name, source, 0])
     connection.commit()
     cursor.close()
     connection.close()
@@ -224,3 +224,64 @@ def get_stats(module):
     cursor.close()
     connection.close()
     return output
+
+def increment_links_counter_for_helpful(student):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE student SET links_counter = links_counter + 1 WHERE name = %s", [student])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_links_counter_for_helpful(student):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT links_counter FROM student WHERE name = %s", [student])
+    counter = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return counter
+
+#method for 'show all'; returns all links
+def get_last_message(user):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT response FROM message WHERE student_name = %s order by id desc limit 1", [user])
+    last_response = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return last_response
+
+def update_modul_satisfaction(module, factor):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE module SET satisfaction = satisfaction + %s WHERE name = %s", [factor, module])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def update_last_module_of_user(user, last_module):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE student SET last_module = %s WHERE name = %s", [last_module, user])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_last_module_of_user(user):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT last_module FROM student WHERE name = %s", [user])
+    last_module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return last_module
+
+def get_module_name(link):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT module FROM data_basis WHERE link = %s", [link])
+    module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return module

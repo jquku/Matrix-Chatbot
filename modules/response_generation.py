@@ -2,8 +2,8 @@ import sys
 
 sys.path.append("./../")
 
-from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats
-from services.database_service import create_new_message
+from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful, get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user
+from services.database_service import create_new_message, update_last_module_of_user, get_module_name, get_last_message
 
 def generate_response(user, message, original_message):
 
@@ -16,7 +16,8 @@ def generate_response(user, message, original_message):
     greetings = message[6]
     goodbyes = message[7]
     stats_called = message[8]
-    links = message[9]
+    message_contains_yes_or_no = message[9]
+    links = message[10]
 
     response = ""
     number_of_links_found = len(links)
@@ -64,20 +65,48 @@ def generate_response(user, message, original_message):
     #step 6: add links if necessary
     if number_of_links_found > 0:
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
+        increment_links_counter_for_helpful(user)
         #print("how many links to show: " + how_many_links_to_show)
         how_many_links_to_show = int(how_many_links_to_show)
         response = response + "I've found " + str(number_of_links_found) + " results. "
         for i in range(0, number_of_links_found):
+            if i == 0:
+                #get module name of best fitting link
+                module = get_module_name(links[i])[0]
+                print("MODULE NAME: " + str(module))
+                update_last_module_of_user(user, module)
             if i < how_many_links_to_show:
                 response = response + links[i] +  "\n" +  "\n"
             else:
                 break
+
+        #step 7: add "is my answer helpful" after every 5th link interaction
+        counter = get_links_counter_for_helpful(user)
+        print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
+        if counter[0] % 5 == 0:    #every 5th link interaction added by "is my answer helpful"
+            response = response + "Is my answer helpful?"
+
+    #step 8: check if student answered with yes or no if answer was helpful
+    else:
+        if message_contains_yes_or_no != False:
+            counter = get_links_counter_for_helpful(user)
+            if counter[0] % 5 == 0:
+                last_message = get_last_message(user)[0]
+                print("LAST MESSAGE: " + str(last_message))
+                helpful_string = "Is my answer helpful?"
+                if helpful_string in last_message:
+                    response = response + "Thanks for your feedback!"
+                    last_module = get_last_module_of_user(user)[0]
+                    print("LAST MODULE: " + str(last_module))
+                    print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
+                    update_modul_satisfaction(last_module, message_contains_yes_or_no)
+
     #print("CURRENT RESPONSE: " + str(response))
-    #step 7: add goodbye if necessary
+    #step 8: add goodbye if necessary
     if goodbyes == True:
         response = response + "Bye!"
 
-    #step 8: check if default answer is necessary
+    #step 9: check if default answer is necessary
     if response == "":
         default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
         response = default_answer

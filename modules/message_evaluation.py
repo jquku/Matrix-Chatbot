@@ -20,6 +20,7 @@ def evaluate_message(user, message):
     greetings = greetings_involved(standardized_message)
     goodbyes = goodbyes_involved(standardized_message)
     stats_called_result = stats_called(only_tokens)
+    message_contains_yes_or_no = check_if_message_contains_yes_or_no(standardized_message)
 
     print("HELP: " + str(help))
     print("CHANGE NUMBER OF LINKS: " + str(number_of_links))
@@ -33,7 +34,7 @@ def evaluate_message(user, message):
     links = sort_links_by_matching(links, standardized_message)
 
     print("LINKS AFTER AFTERAFTER AFTER: " + str(type(links)) + str(links) + str(len(links)))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, links)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, links)
     return evaluation
 
 def help_called(message):
@@ -118,6 +119,17 @@ def stats_called(tokens):
         return module
     else:
         return False
+
+def check_if_message_contains_yes_or_no(tokens):
+    phrases_yes = ["yes", "yeah", "jo", "ja", "klar", "for sure"]
+    phrases_no = ["no", "not at all", "nah", "ne", "nein"]
+    for i in range(0, len(tokens)):
+        if tokens[i] in phrases_yes:
+            return 1
+        if tokens[i] in phrases_no:
+            return -1
+    return False
+
 
 def compare_message_with_data_basis(message):
     link = data_basis_query(message)
