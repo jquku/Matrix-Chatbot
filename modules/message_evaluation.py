@@ -39,7 +39,7 @@ def evaluate_message(user, message):
 
 def help_called(message):
 
-    help_phrases = ['help', 'i need help', 'help me', 'hilf mir', 'hilfe']
+    help_phrases = ['help', 'i need help', 'help me', 'hilf mir', 'hilfe', 'options', 'optionen']
     for i in range(0, len(help_phrases)):
         current = help_phrases[i]
         if current in message:

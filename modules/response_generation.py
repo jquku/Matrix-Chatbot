@@ -24,7 +24,7 @@ def generate_response(user, message, original_message):
 
     #step 1: check if help called
     if help == True:
-        response = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query."
+        response = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query. \n" + "Use 'stats' and add your module to receive the statistics. "
         #create_new_message params = user, original message; information_extracted, all_links, response
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
