@@ -285,3 +285,20 @@ def get_module_name(link):
     cursor.close()
     connection.close()
     return module
+
+def add_organisation_document_to_db(module, original):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO data_basis(module, original, topic, link) VALUES (%s, %s, 'Organisation', '')", [module, original])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_organisation_text(module):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT original FROM data_basis WHERE module = %s and topic = 'Organisation'", [module])
+    module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return module

@@ -3,7 +3,7 @@ import sys
 sys.path.append("./../")
 
 from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful, get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user
-from services.database_service import create_new_message, update_last_module_of_user, get_module_name, get_last_message
+from services.database_service import create_new_message, update_last_module_of_user, get_module_name, get_last_message, get_organisation_text
 
 def generate_response(user, message, original_message):
 
@@ -42,7 +42,6 @@ def generate_response(user, message, original_message):
 
     #step 4: return statistics if called
     if stats_called != False:
-        print("STATS STATS STATS  STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS STATS")
         output_stats = get_stats(stats_called)  #returns sorted list of topics + questions
         response = response + "Here are the most requested topics. \n \n"
         for j in range(0, 5):
@@ -88,6 +87,7 @@ def generate_response(user, message, original_message):
 
     #step 8: check if student answered with yes or no if answer was helpful
     else:
+
         if message_contains_yes_or_no != False:
             counter = get_links_counter_for_helpful(user)
             if counter[0] % 5 == 0:
@@ -101,14 +101,25 @@ def generate_response(user, message, original_message):
                     print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
                     update_modul_satisfaction(last_module, message_contains_yes_or_no)
 
-    #print("CURRENT RESPONSE: " + str(response))
-    #step 8: add goodbye if necessary
+    #step 9: check if user wants to access the document with organisation infos
+    if message_contains_yes_or_no == 1:
+        last_message = get_last_message(user)[0]
+        organisation_string = "Do you want to access the organisation infos?"
+        if organisation_string in last_message:
+            last_module = get_last_module_of_user(user)[0]
+            organisation_text = get_organisation_text(last_module)[0]
+            response = response + organisation_text
+
+    #step 10: add goodbye if necessary
     if goodbyes == True:
         response = response + "Bye!"
 
-    #step 9: check if default answer is necessary
+    #step 11: check if default answer is necessary
     if response == "":
-        default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
+        print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
+        if message_contains_yes_or_no != False:
+            return response
+        default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about. Do you want to access the organisation infos?"
         response = default_answer
     #print("LINKS TYPE: " + str(type(links)))
 

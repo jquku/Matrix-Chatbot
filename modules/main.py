@@ -20,6 +20,7 @@ from nlp import language_processing
 from response_generation import generate_response
 from message_evaluation import evaluate_message
 from index_evaluation import add_data_basis
+from organisation_document import add_organisation_document
 
 lastResponse = ""   #global variables
 lastSender = ""
@@ -82,6 +83,7 @@ async def message_cb(room, event):
 async def main():
     create_tables()
     #add_data_basis()
+    #add_organisation_document()
     await client.login("chatbot123")
     print("after login")
 
