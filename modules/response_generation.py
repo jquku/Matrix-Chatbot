@@ -4,6 +4,7 @@ sys.path.append("./../")
 
 from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful, get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user
 from services.database_service import create_new_message, update_last_module_of_user, get_module_name, get_last_message, get_organisation_text
+from services.database_service import get_stats_preferred
 
 def generate_response(user, message, original_message):
 
@@ -17,23 +18,28 @@ def generate_response(user, message, original_message):
     goodbyes = message[7]
     stats_called = message[8]
     message_contains_yes_or_no = message[9]
-    links = message[10]
+    changed_number_of_stats = message[10]
+    links = message[11]
 
     response = ""
     number_of_links_found = len(links)
 
     #step 1: check if help called
     if help == True:
-        response = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query. \n" + "Use 'stats' and add your module to receive the statistics. "
+        response = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query. \n" + "Use 'stats' and add your module to receive the statistics. \n" + "Use 'stats = X' to return X stats by default."
         #create_new_message params = user, original message; information_extracted, all_links, response
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
-    #step 2: check if number of links called
+    #step 2: check if number of links called or if number of stats changed
     if number_of_links == True:
         #new number of links already set in message_evaluation module
         response = ""
         create_new_message(user, original_message, lowercase_only, "", response)
+        return response
+
+    if changed_number_of_stats == True:
+        response = ""
         return response
 
     #step 3: add greeting if necessary
@@ -44,7 +50,10 @@ def generate_response(user, message, original_message):
     if stats_called != False:
         output_stats = get_stats(stats_called)  #returns sorted list of topics + questions
         response = response + "Here are the most requested topics. \n \n"
-        for j in range(0, 5):
+        number_of_stats_to_return = get_stats_preferred(user)[0]
+        if number_of_stats_to_return > len(output_stats):
+            number_of_stats_to_return = len(output_stats)
+        for j in range(0, number_of_stats_to_return):
             response = response + str(output_stats[j][0]) + " was requested " + str(output_stats[j][1]) + " times. \n"
         #print("STATS STATS STATS: " + str(output_stats) + str(output_stats[0][0]) + str(type(output_stats)) + str(len(output_stats[0])))
         return response
@@ -108,7 +117,7 @@ def generate_response(user, message, original_message):
         if organisation_string in last_message:
             last_module = get_last_module_of_user(user)[0]
             organisation_text = get_organisation_text(last_module)[0]
-            response = response + organisation_text
+            response = response + organisation_text.rstrip()
 
     #step 10: add goodbye if necessary
     if goodbyes == True:

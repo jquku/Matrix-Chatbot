@@ -43,10 +43,10 @@ def create_new_room(room_id, room_name, students):
     cursor.close()
     connection.close()
 
-def create_new_student(name, last_module, links_preferred):
+def create_new_student(name, last_module):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO student(name, last_module, links_preferred, links_counter) VALUES (%s, %s, %s, %s)", [name, last_module, links_preferred, 0])
+    cursor.execute("INSERT INTO student(name, last_module, links_preferred, stats_preferred, links_counter) VALUES (%s, %s, %s, %s, %s)", [name, last_module, 2, 5, 0])
     connection.commit()
     cursor.close()
     connection.close()
@@ -302,3 +302,36 @@ def get_organisation_text(module):
     cursor.close()
     connection.close()
     return module
+
+def check_if_module_already_in_data_basis(module):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT module FROM data_basis WHERE module = %s", [module])
+    module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return module
+
+def delete_existing_data_basis(module):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("DELETE FROM data_basis WHERE module = %s", [module])
+    cursor.close()
+    connection.close()
+
+def get_stats_preferred(user):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT stats_preferred FROM student WHERE name = %s", [user])
+    number_of_stats_to_return = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return number_of_stats_to_return
+
+def change_stats_preferred(user, stats_preferred):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("UPDATE student SET stats_preferred = %s WHERE name = %s", [stats_preferred, user])
+    connection.commit()
+    cursor.close()
+    connection.close()

@@ -6,7 +6,7 @@ import sys
 
 sys.path.append("./../")
 
-from services.database_service import add_data_basis_entry, add_new_module
+from services.database_service import add_data_basis_entry, add_new_module, check_if_module_already_in_data_basis, delete_existing_data_basis
 from nlp import language_processing
 
 #index is used for the data basis; topics need to be transfered into db
@@ -26,51 +26,60 @@ def add_data_basis():
 
     module = "Operating Systems (OS)"
     module = module.lower()
-    url = "https://oer.gitlab.io/OS/index-terms.html"
-    url_prefix = "https://oer.gitlab.io/OS/"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text)
-    links = soup.findAll('li')
-    numberOfLinks = len(links)
-    for link in links:
 
-        ul = link.find('ul')
+    module_in_db = check_if_module_already_in_data_basis(module)[0]
 
-        if ul != None:    #this is a topic within the index without a link, get fist upcoming link then
+    if module_in_db != module:
 
-            topic = ul.find_previous('li').text
-            topic_original = topic.partition('\n')[0]
-            #topic = topic.lower()
-            print("TOPIC 1: " + str(topic_original))
-            topic = language_processing(topic_original)[1]
-            print("TOPIC 2: " + str(topic))
-            topic = list_to_string(topic)
-            #topic = noise_removal(topic)
-            print("TOPIC 3: " + str(topic))
-            #topic = lemmatization_topic(topic)
-            #print("TOKEN post: " + str(topic))
+        url = "https://oer.gitlab.io/OS/index-terms.html"
+        url_prefix = "https://oer.gitlab.io/OS/"
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text)
+        links = soup.findAll('li')
+        numberOfLinks = len(links)
+        for link in links:
 
-            url = ul.find('a').get('href')    #first link is taken
-            url = url_prefix + url
+            ul = link.find('ul')
 
-        else:
+            if ul != None:    #this is a topic within the index without a link, get fist upcoming link then
 
-            topic_original = link.find('a').text
-            print("TOPIC: " + str(topic_original))
-            topic = language_processing(topic_original)[1]   #get final message of nlp module
-            print("TOPIC: " + str(topic))
-            topic = list_to_string(topic)
-            #topic = topic.lower()
-            #topic = noise_removal(topic)
-            print("TOPIC: " + str(topic))
-            #topic = lemmatization_topic(topic)
-            #print("TOKEN post: " + str(topic))
-            #topic = tokenization(topic)
-            url = link.find('a').get('href')
-            url = url_prefix + url
+                topic = ul.find_previous('li').text
+                topic_original = topic.partition('\n')[0]
+                #topic = topic.lower()
+                print("TOPIC 1: " + str(topic_original))
+                topic = language_processing(topic_original)[1]
+                print("TOPIC 2: " + str(topic))
+                topic = list_to_string(topic)
+                #topic = noise_removal(topic)
+                print("TOPIC 3: " + str(topic))
+                #topic = lemmatization_topic(topic)
+                #print("TOKEN post: " + str(topic))
 
-        add_data_basis_entry(module, topic_original, topic, url)
-    add_new_module(module, url)
+                url = ul.find('a').get('href')    #first link is taken
+                url = url_prefix + url
+
+            else:
+
+                topic_original = link.find('a').text
+                print("TOPIC: " + str(topic_original))
+                topic = language_processing(topic_original)[1]   #get final message of nlp module
+                print("TOPIC: " + str(topic))
+                topic = list_to_string(topic)
+                #topic = topic.lower()
+                #topic = noise_removal(topic)
+                print("TOPIC: " + str(topic))
+                #topic = lemmatization_topic(topic)
+                #print("TOKEN post: " + str(topic))
+                #topic = tokenization(topic)
+                url = link.find('a').get('href')
+                url = url_prefix + url
+
+                add_data_basis_entry(module, topic_original, topic, url)
+            add_new_module(module, url)
+
+def delete_existing_data_basis(module):
+    module = module.lower()
+    delete_existing_data_basis(module)
 
 
 if __name__ == '__main__':

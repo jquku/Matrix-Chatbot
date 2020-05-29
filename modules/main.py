@@ -57,7 +57,7 @@ async def message_cb(room, event):
     timestamp_difference = current_timestamp - event_timestamp
 
     #print("timestamp difference: " + str(timestamp_difference))
-    if timestamp_difference > 20000: #5s difference = new message
+    if timestamp_difference > 10000: #10s difference = new message
         print("old")
     else:
         print("NEW MESSAGE")
@@ -66,7 +66,7 @@ async def message_cb(room, event):
             create_new_room(room_id, room_display_name, student_name)
 
         if check_if_student_is_existing(student_name) == False:
-            create_new_student(student_name, "OS", 2)   #default: show 2 links
+            create_new_student(student_name, "OS")   #default: show 2 links
 
         global lastSender
         global lastResponse

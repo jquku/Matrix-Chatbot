@@ -5,7 +5,7 @@ sys.path.append("./../")
 
 from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_all_modules
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
-
+from services.database_service import change_stats_preferred
 
 def evaluate_message(user, message):
 
@@ -15,6 +15,7 @@ def evaluate_message(user, message):
 
     help = help_called(lowercase_only)
     number_of_links = change_standard_number_of_links_called(user, lowercase_only)
+    changed_number_of_stats = change_number_of_stats_to_return(user, lowercase_only)
     show_more = show_more_called(lowercase_only)
     show_all = show_all_called(lowercase_only)
     greetings = greetings_involved(standardized_message)
@@ -34,7 +35,7 @@ def evaluate_message(user, message):
     links = sort_links_by_matching(links, standardized_message)
 
     print("LINKS AFTER AFTERAFTER AFTER: " + str(type(links)) + str(links) + str(len(links)))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, links)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, links)
     return evaluation
 
 def help_called(message):
@@ -56,6 +57,16 @@ def change_standard_number_of_links_called(user, message):
             number = number[0]
             set_number_of_links_to_be_shown(user, number)
             return True
+    else:
+        return False
+
+def change_number_of_stats_to_return(user, message):
+    if "stats = " in message or "stat = " in message or "stats= " in message or "stat=" in message:
+
+        number_of_stats = re.findall(r'\d+', message)
+        number_of_stats = number_of_stats[0]
+        change_stats_preferred(user, number_of_stats)
+        return True
     else:
         return False
 

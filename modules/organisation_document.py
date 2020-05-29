@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup   #scraping by using the BeautifulSoup package
 
 import sys
-import PyPDF2
 
 sys.path.append("./../")
 
@@ -38,7 +37,6 @@ def add_organisation_document():
         interpreter.process_page(page)
 
     text = retstr.getvalue()
-    text.rstrip()
 
     fp.close()
     device.close()
