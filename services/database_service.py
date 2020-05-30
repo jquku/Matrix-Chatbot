@@ -375,3 +375,21 @@ def check_if_link_belongs_to_module(link):
     cursor.close()
     connection.close()
     return module
+
+def add_salt_value(value):
+    print("ABOUT TO ADD VALUE")
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO salt(value) VALUES (%s)", [value])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_salt_value():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT value FROM salt")
+    value = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return value

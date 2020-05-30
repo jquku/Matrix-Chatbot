@@ -13,11 +13,12 @@ def create_tables():
     #create tables via sql commands
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS room (id SERIAL PRIMARY KEY, room_id text, room_name VARCHAR(255) NOT NULL, students text)")
-    cursor.execute("CREATE TABLE IF NOT EXISTS student (id SERIAL PRIMARY KEY, name VARCHAR(255), last_module VARCHAR(255), links_preferred integer, stats_preferred integer, links_counter integer)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS student (id SERIAL PRIMARY KEY, name text, last_module VARCHAR(255), links_preferred integer, stats_preferred integer, links_counter integer)")
     cursor.execute("CREATE TABLE IF NOT EXISTS statistics (id SERIAL PRIMARY KEY, module VARCHAR(255), topic VARCHAR(255), questioned integer)")
     cursor.execute("CREATE TABLE IF NOT EXISTS message (id SERIAL PRIMARY KEY, student_name VARCHAR(255), body text, information_extracted text, all_links text, response text)")
     cursor.execute("CREATE TABLE IF NOT EXISTS data_basis (id SERIAL PRIMARY KEY, module VARCHAR(255), original text, topic VARCHAR(255), link VARCHAR(255))")
     cursor.execute("CREATE TABLE IF NOT EXISTS module (id SERIAL PRIMARY KEY, name VARCHAR(255), original VARCHAR(255), source VARCHAR(255), satisfaction integer, feedback_given integer)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS salt (value text)")
     connection.commit() #commit changes
     cursor.close()
     connection.close()

@@ -16,11 +16,15 @@ from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
 
 from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
+from services.database_service import get_salt_value, add_salt_value
 from nlp import language_processing
 from response_generation import generate_response
 from message_evaluation import evaluate_message
 from index_evaluation import add_data_basis
 from organisation_document import add_organisation_document
+
+#for hashing
+import hashlib, uuid
 
 lastResponse = ""   #global variables
 lastSender = ""
@@ -45,11 +49,28 @@ async def sendMessage(room_id, response, student_name):
     global lastSender
     lastResponse = response
     lastSender = "riot_chatbot"
+    salt_value = get_salt_value()[0]
+    salt_value = salt_value.encode('utf-8')
+    lastSender = lastSender.encode('utf-8')
+    lastSender = hashlib.sha512(lastSender + salt_value).hexdigest()
 
 async def message_cb(room, event):
     room_id = str(room.room_id)
     room_display_name = room.display_name
     student_name = room.user_name(event.sender)
+
+    #hasing of the user name with salt
+    salt_value = get_salt_value()
+    if salt_value == None:
+        salt_value = uuid.uuid4().hex
+        add_salt_value(salt_value)
+    else:
+        salt_value = salt_value[0]
+    salt_value = salt_value.encode('utf-8')
+    student_name = student_name.encode('utf-8')
+    hashed_user_name = hashlib.sha512(student_name + salt_value).hexdigest()
+    student_name = hashed_user_name
+
     message_body = event.body
 
     event_timestamp = event.server_timestamp #tiestamp in ms (unix time)
@@ -61,7 +82,6 @@ async def message_cb(room, event):
         print("old")
     else:
         print("NEW MESSAGE")
-
         if check_if_room_is_existing(room_id) == False:
             create_new_room(room_id, room_display_name, student_name)
 
