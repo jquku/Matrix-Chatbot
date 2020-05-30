@@ -17,9 +17,11 @@ def generate_response(user, message, original_message):
     greetings = message[6]
     goodbyes = message[7]
     stats_called = message[8]
+    print("STATS CALLED: " + str(stats_called))
     message_contains_yes_or_no = message[9]
     changed_number_of_stats = message[10]
-    links = message[11]
+    links_from_multiple_modules = message[11]
+    links = message[12]
 
     response = ""
     number_of_links_found = len(links)
@@ -40,6 +42,7 @@ def generate_response(user, message, original_message):
 
     if changed_number_of_stats == True:
         response = ""
+        create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
     #step 3: add greeting if necessary
@@ -56,6 +59,7 @@ def generate_response(user, message, original_message):
         for j in range(0, number_of_stats_to_return):
             response = response + str(output_stats[j][0]) + " was requested " + str(output_stats[j][1]) + " times. \n"
         #print("STATS STATS STATS: " + str(output_stats) + str(output_stats[0][0]) + str(type(output_stats)) + str(len(output_stats[0])))
+        create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
     #step 5: check if show more or show all is called
@@ -72,16 +76,25 @@ def generate_response(user, message, original_message):
 
     #step 6: add links if necessary
     if number_of_links_found > 0:
+
+        if links_from_multiple_modules != False:
+            response = response + "I've found fitting results from the following modules: \n" + links_from_multiple_modules + "Which module are you interested in?"
+            all_links_db = list_to_string(links)
+            create_new_message(user, original_message, lowercase_only, all_links_db, response)
+            return response
+
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
         increment_links_counter_for_helpful(user)
         #print("how many links to show: " + how_many_links_to_show)
         how_many_links_to_show = int(how_many_links_to_show)
         response = response + "I've found " + str(number_of_links_found) + " results. "
+        print("RESPONSE: " + str(response))
         for i in range(0, number_of_links_found):
             if i == 0:
+                print("LINKS[i]: " + str(links[i]))
                 #get module name of best fitting link
                 module = get_module_name(links[i])[0]
-                print("MODULE NAME: " + str(module))
+                #print("MODULE NAME: " + str(module))
                 update_last_module_of_user(user, module)
             if i < how_many_links_to_show:
                 response = response + links[i] +  "\n" +  "\n"
@@ -90,7 +103,7 @@ def generate_response(user, message, original_message):
 
         #step 7: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
-        print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
+        #print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
         if counter[0] % 5 == 0:    #every 5th link interaction added by "is my answer helpful"
             response = response + "Is my answer helpful?"
 
@@ -101,13 +114,13 @@ def generate_response(user, message, original_message):
             counter = get_links_counter_for_helpful(user)
             if counter[0] % 5 == 0:
                 last_message = get_last_message(user)[0]
-                print("LAST MESSAGE: " + str(last_message))
+                #print("LAST MESSAGE: " + str(last_message))
                 helpful_string = "Is my answer helpful?"
                 if helpful_string in last_message:
                     response = response + "Thanks for your feedback!"
                     last_module = get_last_module_of_user(user)[0]
-                    print("LAST MODULE: " + str(last_module))
-                    print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
+                    #print("LAST MODULE: " + str(last_module))
+                    #print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
                     update_modul_satisfaction(last_module, message_contains_yes_or_no)
 
     #step 9: check if user wants to access the document with organisation infos
@@ -116,8 +129,10 @@ def generate_response(user, message, original_message):
         organisation_string = "Do you want to access the organisation infos?"
         if organisation_string in last_message:
             last_module = get_last_module_of_user(user)[0]
-            organisation_text = get_organisation_text(last_module)[0]
-            response = response + organisation_text.rstrip()
+            organisation_text = get_organisation_text(last_module)
+            if organisation_text != None:
+                organisation_text = organisation_text[0]
+                response = response + organisation_text.rstrip()
 
     #step 10: add goodbye if necessary
     if goodbyes == True:
@@ -125,7 +140,7 @@ def generate_response(user, message, original_message):
 
     #step 11: check if default answer is necessary
     if response == "":
-        print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
+        #print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
         if message_contains_yes_or_no != False:
             return response
         default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about. Do you want to access the organisation infos?"

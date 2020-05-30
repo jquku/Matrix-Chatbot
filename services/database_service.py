@@ -67,10 +67,10 @@ def add_data_basis_entry(module, original, topic, url):
     cursor.close()
     connection.close()
 
-def add_new_module(name, source):
+def add_new_module(name, original, source):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO module(name, source, satisfaction, feedback_given) VALUES (%s, %s, %s, %s)", [name, source, 0, 0])
+    cursor.execute("INSERT INTO module(name, original, source, satisfaction, feedback_given) VALUES (%s, %s, %s, %s, %s)", [name, original, source, 0, 0])
     connection.commit()
     cursor.close()
     connection.close()
@@ -335,3 +335,43 @@ def change_stats_preferred(user, stats_preferred):
     connection.commit()
     cursor.close()
     connection.close()
+
+def links_from_multiple_modules(link):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT module FROM data_basis WHERE link = %s", [link])
+    module = cursor.fetchone()
+    module = module[0]
+    cursor.execute("SELECT original FROM module WHERE name = %s", [module])
+    original_module_name = cursor.fetchone()
+    original_module_name = original_module_name[0]
+    cursor.close()
+    connection.close()
+    return original_module_name
+
+def get_all_modules():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT name FROM module")
+    all_modules = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return all_modules
+
+def get_all_links_of_last_response(user):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT all_links FROM message WHERE student_name = %s order by id desc limit 1", [user])
+    all_links = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return all_links
+
+def check_if_link_belongs_to_module(link):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT module FROM data_basis WHERE link = %s", [link])
+    module = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return module

@@ -29,7 +29,7 @@ client = AsyncClient("https://matrix.org", "@riot_chatbot:matrix.org")
 
 
 async def sendMessage(room_id, response, student_name):
-    print("RESPONSE: " + str(response))
+    #print("RESPONSE: " + str(response))
 
 
     await client.room_send(
