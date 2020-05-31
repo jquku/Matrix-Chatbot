@@ -46,7 +46,7 @@ def create_new_room(room_id, room_name, students):
 def create_new_student(name, last_module):
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO student(name, last_module, links_preferred, stats_preferred, links_counter) VALUES (%s, %s, %s, %s, %s)", [name, last_module, 2, 5, 0])
+    cursor.execute("INSERT INTO student(name, last_module, links_preferred, stats_preferred, links_counter, language) VALUES (%s, %s, %s, %s, %s, %s)", [name, last_module, 2, 5, 0, "english"])
     connection.commit()
     cursor.close()
     connection.close()
@@ -393,3 +393,21 @@ def get_salt_value():
     cursor.close()
     connection.close()
     return value
+
+def change_student_language(user, language):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    print("USER: " + str(user) + " neue Sprache: " + str(language))
+    cursor.execute("UPDATE student SET language = %s WHERE name = %s", [language, user])
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+def get_student_language(user):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT language FROM student WHERE name = %s", [user])
+    language = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return language

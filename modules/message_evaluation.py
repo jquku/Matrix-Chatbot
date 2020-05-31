@@ -6,7 +6,7 @@ sys.path.append("./../")
 from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_all_modules
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
 from services.database_service import change_stats_preferred, links_from_multiple_modules, get_last_message, get_all_modules, get_all_links_of_last_response
-from services.database_service import check_if_link_belongs_to_module
+from services.database_service import check_if_link_belongs_to_module, change_student_language
 
 def evaluate_message(user, message):
 
@@ -23,6 +23,7 @@ def evaluate_message(user, message):
     goodbyes = goodbyes_involved(standardized_message)
     stats_called_result = stats_called(only_tokens)
     message_contains_yes_or_no = check_if_message_contains_yes_or_no(only_tokens)
+    change_language = change_user_language(user, lowercase_only)
 
     #print("HELP: " + str(help))
     #print("CHANGE NUMBER OF LINKS: " + str(number_of_links))
@@ -44,7 +45,7 @@ def evaluate_message(user, message):
         links_from_multiple_modules = False
     print("LINKS FROM MULTIPLE MODULES: " + str(links_from_multiple_modules))
     print("LINKS: " + str(links))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, links_from_multiple_modules, links)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, change_language, links_from_multiple_modules, links)
     return evaluation
 
 def help_called(message):
@@ -79,6 +80,24 @@ def change_number_of_stats_to_return(user, message):
     else:
         return False
 
+def change_user_language(user, message):
+    if "language = " in message or "language=" in message or "lang =" in message or "lang=" in message or "sprache=" in message or "sprache =" in message:
+
+        if "en" in message or "american" in message:
+            change_student_language(user, 'english')
+            return True
+
+        if "ger" in message or "de" in message:
+            print("DEUTSCH")
+            change_student_language(user, 'german')
+            return True
+
+        else:
+            return False
+
+    else:
+        return False
+
 def show_more_called(message):
 
     if "show more" in message or "zeig mehr" in message:
@@ -92,6 +111,8 @@ def show_all_called(message):
         return True
     else:
         return False
+
+
 
 def greetings_involved(tokens):  #greeting forms found on the internet
     phrases = ["hi", "hello", "hey", "helloo", "hellooo", "g morining",
