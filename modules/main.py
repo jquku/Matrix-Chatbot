@@ -18,10 +18,10 @@ from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
 from services.database_service import get_salt_value, add_salt_value
 from nlp import language_processing
-from response_generation import generate_response
+from response_management import generate_response
 from message_evaluation import evaluate_message
 from index_evaluation import add_data_basis
-from organisation_document import add_organisation_document
+from organisational_document import add_organisation_document
 
 #for hashing
 import hashlib, uuid
