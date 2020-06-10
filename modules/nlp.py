@@ -31,6 +31,7 @@ def language_processing(message):
     without_stop_words = remove_stop_words(after_lemmitation)
 
     final_message = remove_spelling_errors(without_stop_words)
+
     #print("lowercased: " + str(lowercased))
     #print("final FINAL FINAL FINAL message: " + str(final_message) + str(type(final_message)))
     return lowercased, final_message, tokens    #returns tuple

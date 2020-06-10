@@ -195,17 +195,20 @@ def sort_links_by_matching(links, keywords):
     for m in range(0, len(listA)):
         current = []
         element = listA[m]
-        #print("current element: " + str(element))
+        print("current element: " + str(element))
         current.append(element)
         current_list_a = " ".join(current).split()
-        #print("current_list_a: " + str(current_list_a))
-        #print("listB: " + str(keywords))
+        print("current_list_a: " + str(current_list_a))
+        print("listB: " + str(keywords))
         setA = set(current_list_a)
         setB = set(keywords)
-
+        print("SETA: " + str(setA))
+        print("SETB:" + str(setB))
         overlap = setA & setB
+        print("overlap: " + str(overlap))
 
         matching = float(len(overlap)) / len(setB) * 100
+        print("matching" + str(matching))
 
         if matching > 0:
 
@@ -235,8 +238,8 @@ def sort_links_by_matching(links, keywords):
                 #else:
                 #    create_new_statistic_entry
 
-    #print("list with matching coefficients: " + str(list_with_matching_coefficients))
-    #print("new links list: " + str(new_links_list))
+    print("list with matching coefficients: " + str(list_with_matching_coefficients))
+    print("new links list: " + str(new_links_list))
     #sort list based on list with matching coefficients
 
     sorted_list = [x for _,x in sorted(zip(list_with_matching_coefficients, new_links_list))]
@@ -249,7 +252,7 @@ def sort_links_by_matching(links, keywords):
         for j in range(0, len(sorted_list)):
             #print("current element: " + str(sorted_list[j][1]))
             all_links.append(sorted_list[j][1])   #only return link, not whole tuple
-    #print("all links: " + str(all_links))
+    print("all links: " + str(all_links))
     all_links = list(dict.fromkeys(all_links)) #potentially two topics have same link; remove from list
     return all_links
 
