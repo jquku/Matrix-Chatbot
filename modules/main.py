@@ -86,7 +86,7 @@ async def message_cb(room, event):
             create_new_room(room_id, room_display_name, student_name)
 
         if check_if_student_is_existing(student_name) == False:
-            create_new_student(student_name, "OS")   #default: show 2 links
+            create_new_student(student_name, "operating systems (os)")   #default: show 2 links
 
         global lastSender
         global lastResponse
@@ -101,9 +101,9 @@ async def message_cb(room, event):
                 await sendMessage(room_id, response, student_name)
 
 async def main():
-    create_tables()
+    #create_tables()
     #add_data_basis()
-    #add_organisation_document()
+    add_organisation_document()
     await client.login("chatbot123")
     print("after login")
 

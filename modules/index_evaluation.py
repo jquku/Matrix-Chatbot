@@ -39,6 +39,8 @@ def add_second_index():
         soup = BeautifulSoup(open("test_index.html"), "html.parser")
         links = soup.findAll('li')
         numberOfLinks = len(links)
+        module_id = add_new_module(module, module_original, url)
+        print("MODULE ID: " + str(module_id))
         for link in links:
 
             ul = link.find('ul')
@@ -77,16 +79,14 @@ def add_second_index():
                 #url = url_prefix + url
                 #url = ""
 
-            add_data_basis_entry(module, topic_original, topic, url)
-        add_new_module(module, module_original, url)
-
+            add_data_basis_entry(module_id, topic_original, topic, url)
 
 def add_data_basis():
 
     module = "Operating Systems (OS)"
     module_original = module
     module = module.lower()
-
+    print("module lower: " + str(module))
     module_in_db = check_if_module_already_in_data_basis(module)
 
     if module_in_db == None:
@@ -97,6 +97,7 @@ def add_data_basis():
         soup = BeautifulSoup(response.text)
         links = soup.findAll('li')
         numberOfLinks = len(links)
+        module_id = add_new_module(module, module_original, url)
         for link in links:
 
             ul = link.find('ul')
@@ -134,8 +135,7 @@ def add_data_basis():
                 url = link.find('a').get('href')
                 url = url_prefix + url
 
-            add_data_basis_entry(module, topic_original, topic, url)
-        add_new_module(module, module_original, url)
+            add_data_basis_entry(module_id, topic_original, topic, url)
 
 def delete_existing_data_basis(module):
     module = module.lower()

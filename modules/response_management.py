@@ -17,7 +17,6 @@ def generate_response(user, message, original_message):
     greetings = message[6]
     goodbyes = message[7]
     stats_called = message[8]
-    print("STATS CALLED: " + str(stats_called))
     message_contains_yes_or_no = message[9]
     changed_number_of_stats = message[10]
     change_language = message[11]
@@ -74,13 +73,11 @@ def generate_response(user, message, original_message):
     #step 5: check if show more or show all is called
     if show_more == True:
         links_last_message_more = get_next_links(user)
-        #print("SHOW MORE TYPE: " + str(type(links_last_message_more)))
         response = response + links_last_message_more
 
     if show_all == True:
         links_last_message_all = get_concerning_links(user)
         #TUPLE
-        #print("SHOW ALL TYPE: " + str(type(links_last_message_all)))
         response = response + links_last_message_all[0]
 
     #step 6: add links if necessary
@@ -115,7 +112,6 @@ def generate_response(user, message, original_message):
                 response = response + links[i] +  "\n" +  "\n"
             else:
                 break
-
         #step 7: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
         #print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
@@ -127,12 +123,11 @@ def generate_response(user, message, original_message):
 
     #step 8: check if student answered with yes or no if answer was helpful
     else:
-
         if message_contains_yes_or_no != False:
             counter = get_links_counter_for_helpful(user)
             if counter[0] % 5 == 0:
                 last_message = get_last_message(user)[0]
-                #print("LAST MESSAGE: " + str(last_message))
+                print("LAST MESSAGE: " + str(last_message))
                 helpful_string_english = "Is my answer helpful?"
                 helpful_string_german = "War meine Antwort hilfreich?"
                 if helpful_string_english in last_message or helpful_string_german in last_message:
@@ -144,6 +139,9 @@ def generate_response(user, message, original_message):
                     #print("LAST MODULE: " + str(last_module))
                     #print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
                     update_modul_satisfaction(last_module, message_contains_yes_or_no)
+                    create_new_message(user, original_message, lowercase_only, "", response)
+                    return response
+
 
     #step 9: check if user wants to access the document with organisation infos
     if message_contains_yes_or_no == 1:
@@ -168,6 +166,10 @@ def generate_response(user, message, original_message):
         #print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
         if message_contains_yes_or_no != False:
             return response
+        #    helpful_string_english = "Is my answer helpful?"
+        #    helpful_string_german = "War meine Antwort hilfreich?"
+        #    if helpful_string_english in last_message or helpful_string_german in last_message:
+        #        return response
         if language_of_user == "english":
             default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about. Do you want to access the organisation infos?"
         else:

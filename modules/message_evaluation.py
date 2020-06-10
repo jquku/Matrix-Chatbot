@@ -6,7 +6,7 @@ sys.path.append("./../")
 from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_all_modules
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
 from services.database_service import change_stats_preferred, links_from_multiple_modules, get_last_message, get_all_modules, get_all_links_of_last_response
-from services.database_service import check_if_link_belongs_to_module, change_student_language
+from services.database_service import check_if_link_belongs_to_module, change_student_language, get_module_name_based_on_id
 
 def evaluate_message(user, message):
 
@@ -31,6 +31,7 @@ def evaluate_message(user, message):
     #print("SHOW ALL: " + str(show_all))
     #print("GREETINGS: " + str(greetings))
     #print("GOODBYES: " + str(goodbyes))
+    #print("MESSAGE CONTAINS YES OR NO: " + str(message_contains_yes_or_no))
 
     links = compare_message_with_data_basis(standardized_message)
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
@@ -43,8 +44,8 @@ def evaluate_message(user, message):
     if answer_given_for_multiple_modules != False:
         links = answer_given_for_multiple_modules
         links_from_multiple_modules = False
-    print("LINKS FROM MULTIPLE MODULES: " + str(links_from_multiple_modules))
-    print("LINKS: " + str(links))
+    #print("LINKS FROM MULTIPLE MODULES: " + str(links_from_multiple_modules))
+    #print("LINKS: " + str(links))
     evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, change_language, links_from_multiple_modules, links)
     return evaluation
 
@@ -113,7 +114,6 @@ def show_all_called(message):
         return False
 
 
-
 def greetings_involved(tokens):  #greeting forms found on the internet
     phrases = ["hi", "hello", "hey", "helloo", "hellooo", "g morining",
         "gmorning","good morning", "morning", "good day", "good afternoon",
@@ -169,11 +169,9 @@ def check_if_message_contains_yes_or_no(tokens):
     phrases_no = ["no", "not at all", "nah", "ne", "nein"]
     for i in range(0, len(tokens)):
         if tokens[i] in phrases_yes:
-            #print("PHRASES YES")
-            return 1
+            return 1    #1 means yes
         if tokens[i] in phrases_no:
-            #print("PHRASES NO")
-            return -1
+            return -1   #-1 means no
     return False
 
 
@@ -195,20 +193,13 @@ def sort_links_by_matching(links, keywords):
     for m in range(0, len(listA)):
         current = []
         element = listA[m]
-        print("current element: " + str(element))
         current.append(element)
         current_list_a = " ".join(current).split()
-        print("current_list_a: " + str(current_list_a))
-        print("listB: " + str(keywords))
         setA = set(current_list_a)
         setB = set(keywords)
-        print("SETA: " + str(setA))
-        print("SETB:" + str(setB))
         overlap = setA & setB
-        print("overlap: " + str(overlap))
 
         matching = float(len(overlap)) / len(setB) * 100
-        print("matching" + str(matching))
 
         if matching > 0:
 
@@ -220,7 +211,8 @@ def sort_links_by_matching(links, keywords):
                 #print("matching: " + str(matching))
                 query_result = get_original_topic(element)  #returns tuple
                 original = query_result[0]
-                module = query_result[1]
+                module_id = query_result[1]
+                module = get_module_name_based_on_id(module_id)
                 #print("original: " + str(type(original)) + str(original))
                 #original = str(original[0])
                 module_in_statistic = check_if_topic_already_in_statistic(original)
@@ -231,15 +223,9 @@ def sort_links_by_matching(links, keywords):
                     create_new_statistic_entry(module, original)
                 else:
                     increment_statistic_topic_counter(module, original)
-                #if len(topic_in_statistic) == "":
-                #    create_new_statistic_entry()
-                #if topic_in_statistic == True:
-                #    increment_statistic_topic_counter
-                #else:
-                #    create_new_statistic_entry
 
-    print("list with matching coefficients: " + str(list_with_matching_coefficients))
-    print("new links list: " + str(new_links_list))
+    #print("list with matching coefficients: " + str(list_with_matching_coefficients))
+    #print("new links list: " + str(new_links_list))
     #sort list based on list with matching coefficients
 
     sorted_list = [x for _,x in sorted(zip(list_with_matching_coefficients, new_links_list))]
@@ -252,7 +238,7 @@ def sort_links_by_matching(links, keywords):
         for j in range(0, len(sorted_list)):
             #print("current element: " + str(sorted_list[j][1]))
             all_links.append(sorted_list[j][1])   #only return link, not whole tuple
-    print("all links: " + str(all_links))
+    #print("all links: " + str(all_links))
     all_links = list(dict.fromkeys(all_links)) #potentially two topics have same link; remove from list
     return all_links
 
@@ -265,7 +251,6 @@ def check_if_links_from_multiple_modules(links):
             list_of_moduls_with_links.append(module)
     #print("LISTE: " + str(list_of_moduls_with_links))
     if len(list_of_moduls_with_links) == 1:
-        #print("RETURN FALSE")
         return False#
     else:
         all_modules_string = ""
@@ -293,7 +278,7 @@ def check_if_answer_for_results_from_multiple_modules_given(user, tokens):
         #print("ALL MODULES: " + str(new_list_of_all_modules) + str(type(new_list_of_all_modules)) + str(len(new_list_of_all_modules)))
         for i in range(0, len(new_list_of_all_modules)):
             current_module = new_list_of_all_modules[i]
-            print("Tokens: " + str(tokens))
+            #print("Tokens: " + str(tokens))
             for t in range(0, len(tokens)):
                 current_token = tokens[t]
                 if current_token in current_module:
@@ -302,22 +287,21 @@ def check_if_answer_for_results_from_multiple_modules_given(user, tokens):
             #    modules_to_show_links_of.append(current_module)
     if len(modules_to_show_links_of) == 0:
         return False
-    print("modules to show links of: " + str(modules_to_show_links_of))
+    #print("modules to show links of: " + str(modules_to_show_links_of))
     #get links of last response
     all_links  = get_all_links_of_last_response(user)
     if all_links != None:
         all_links = all_links[0]
     all_links_string = all_links
     all_links = all_links.split()
-    print("ALL LINKS: " + str(all_links))
+    #print("ALL LINKS: " + str(all_links))
     new_links = []
     for k in range(0, len(all_links)):
         current_link = all_links[k]
-        print("CURRENT LINK: " + str(current_link))
+        #print("CURRENT LINK: " + str(current_link))
         module = check_if_link_belongs_to_module(current_link)[0]
-        print("Belonging module: " + str(module))
+        #print("Belonging module: " + str(module))
         if module in modules_to_show_links_of:
             new_links.append(current_link)
-            print("should be in")
-    print("NEW LINKS: " + str(new_links))
+    #print("NEW LINKS: " + str(new_links))
     return new_links
