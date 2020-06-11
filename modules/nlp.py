@@ -4,7 +4,7 @@ import re
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
-from autocorrect import Speller
+from spellchecker import SpellChecker
 
 sys.path.append("./../")
 #nltk.download()
@@ -32,8 +32,6 @@ def language_processing(message):
 
     final_message = remove_spelling_errors(without_stop_words)
 
-    #print("lowercased: " + str(lowercased))
-    #print("final FINAL FINAL FINAL message: " + str(final_message) + str(type(final_message)))
     return lowercased, final_message, tokens    #returns tuple
 
 #lowercasing every letter in string
@@ -68,10 +66,8 @@ def remove_stop_words(list):
     return filtered_list
 
 def remove_spelling_errors(list):
-    spell_english = Speller(lang='en')
+    spell = SpellChecker()
     new_list = []
-    for i in range(0, len(list)):
-        current_element = list[i]
-        autocorrect = spell_english(current_element)
-        new_list.append(autocorrect)
+    for word in list:
+        new_list.append(spell.correction(word))
     return new_list

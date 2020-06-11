@@ -103,7 +103,7 @@ async def message_cb(room, event):
 async def main():
     #create_tables()
     #add_data_basis()
-    add_organisation_document()
+    #add_organisation_document()
     await client.login("chatbot123")
     print("after login")
 
