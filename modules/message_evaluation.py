@@ -7,20 +7,20 @@ from services.database_service import data_basis_query, get_number_of_links_to_b
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
 from services.database_service import change_stats_preferred, links_from_multiple_modules, get_last_message, get_all_modules, get_all_links_of_last_response
 from services.database_service import check_if_link_belongs_to_module, change_student_language, get_module_name_based_on_id
+from services.database_service import data_basis_query, data_basis_query_small_talk, data_basis_query_organisational
 
 def evaluate_message(user, message):
 
     lowercase_only = message[0]
     standardized_message = message[1]
     only_tokens = message[2]
+    after_lemmitation = message[3]
 
     help = help_called(lowercase_only)
     number_of_links = change_standard_number_of_links_called(user, lowercase_only)
     changed_number_of_stats = change_number_of_stats_to_return(user, lowercase_only)
     show_more = show_more_called(lowercase_only)
     show_all = show_all_called(lowercase_only)
-    greetings = greetings_involved(standardized_message)
-    goodbyes = goodbyes_involved(standardized_message)
     stats_called_result = stats_called(only_tokens)
     message_contains_yes_or_no = check_if_message_contains_yes_or_no(only_tokens)
     change_language = change_user_language(user, lowercase_only)
@@ -33,11 +33,22 @@ def evaluate_message(user, message):
     #print("GOODBYES: " + str(goodbyes))
     #print("MESSAGE CONTAINS YES OR NO: " + str(message_contains_yes_or_no))
 
-    links = compare_message_with_data_basis(standardized_message)
+    links = data_basis_query(standardized_message)
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
     links = sort_links_by_matching(links, standardized_message)
+    print("standardized message: " + str(standardized_message))
+    print("after lemmitation: " + str(after_lemmitation))
+    small_talk = data_basis_query_small_talk(after_lemmitation)
+    print("small talk before: " + str(small_talk))
+    small_talk = sort_links_by_matching_general(small_talk, after_lemmitation, 75)
+    print("small talk after: " + str(small_talk))
+    if len(small_talk) > 0:
+        small_talk = [small_talk[0]]
 
-    #print("LINKS AFTER AFTERAFTER AFTER: " + str(type(links)) + str(links) + str(len(links)))
+    organisational = data_basis_query_organisational(after_lemmitation)
+    print("ORGANISATIONAL Before: " + str(organisational))
+    organisational = sort_links_by_matching_general(organisational, after_lemmitation, 75)
+    print("ORGANISATIONAL: " + str(organisational))
 
     links_from_multiple_modules = check_if_links_from_multiple_modules(links)
     answer_given_for_multiple_modules = check_if_answer_for_results_from_multiple_modules_given(user, only_tokens)
@@ -45,8 +56,7 @@ def evaluate_message(user, message):
         links = answer_given_for_multiple_modules
         links_from_multiple_modules = False
     #print("LINKS FROM MULTIPLE MODULES: " + str(links_from_multiple_modules))
-    #print("LINKS: " + str(links))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, greetings, goodbyes, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, change_language, links_from_multiple_modules, links)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, change_language, links_from_multiple_modules, links, small_talk, organisational)
     return evaluation
 
 def help_called(message):
@@ -113,36 +123,6 @@ def show_all_called(message):
     else:
         return False
 
-
-def greetings_involved(tokens):  #greeting forms found on the internet
-    phrases = ["hi", "hello", "hey", "helloo", "hellooo", "g morining",
-        "gmorning","good morning", "morning", "good day", "good afternoon",
-        "good evening","greetings", "greeting", "good to see you",
-        "its good seeing you","how are you", "how're you", "how are you doing",
-        "how ya doin'","how ya doin", "how is everything",
-        "how is everything going","how's everything going", "how is you",
-        "how's you", "how are things","how're things", "how is it going",
-        "how's it going", "how's it goin'", "how's it goin",
-        "how is life been treating you", "how's life been treating you",
-        "how have you been", "how've you been", "what is up", "what's up",
-        "what is cracking", "what's cracking", "what is good", "what's good",
-        "what is happening", "what's happening", "what is new", "what's new",
-        "what is neww", "g’day", "howdy", "hallo", "bonjour"]
-    for i in range(0, len(tokens)):
-        if tokens[i] in phrases:
-            return True
-    return False
-
-def goodbyes_involved(tokens):
-    phrases = ["goodbye", "au revoir", "bye", "tschüß", "tschau", "see you",
-        "bye bye", "see you soon", "auf wiedersehen", "bis bald",
-        "take it easy", "have a nice day", "take care", "goodnight",
-        "catch you later", "peace", "peace out"]
-    for i in range(0, len(tokens)):
-        if tokens[i] in phrases:
-            return True
-    return False
-
 def stats_called(tokens):
     stats_called = False
     phrases = ["statistics", "stat", "stats", "analytics", "statistik","analytik", "statistiken"]
@@ -173,11 +153,6 @@ def check_if_message_contains_yes_or_no(tokens):
         if tokens[i] in phrases_no:
             return -1   #-1 means no
     return False
-
-
-def compare_message_with_data_basis(message):
-    link = data_basis_query(message)
-    return link
 
 def sort_links_by_matching(links, keywords):
 
@@ -239,6 +214,47 @@ def sort_links_by_matching(links, keywords):
             #print("current element: " + str(sorted_list[j][1]))
             all_links.append(sorted_list[j][1])   #only return link, not whole tuple
     #print("all links: " + str(all_links))
+    all_links = list(dict.fromkeys(all_links)) #potentially two topics have same link; remove from list
+    return all_links
+
+def sort_links_by_matching_general(links, keywords, value):
+
+    print("keyowrds: " + str(keywords))
+    links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
+    only_topic = []
+    for i in range(0, len(links)):
+        only_topic.append(links[i][0])
+
+    listA = list(only_topic)
+
+    list_with_matching_coefficients = []
+    new_links_list = []
+    for m in range(0, len(listA)):
+        current = []
+        element = listA[m]
+        current.append(element)
+        current_list_a = " ".join(current).split()
+        setA = set(keywords)
+        setB = set(current_list_a)
+        #setA = set(current_list_a)
+        #setB = set(keywords)
+        overlap = setA & setB
+
+        matching = float(len(overlap)) / len(setB) * 100
+        print("MATCHING: " + str(matching))
+        if matching >= value:
+
+            list_with_matching_coefficients.append(matching)
+            new_links_list.append(links[m])
+
+    sorted_list = [x for _,x in sorted(zip(list_with_matching_coefficients, new_links_list))]
+    sorted_list.reverse()
+
+    #each list element contains topic + link
+    all_links = []
+    if len(sorted_list) > 0:
+        for j in range(0, len(sorted_list)):
+            all_links.append(sorted_list[j][1])   #only return link, not whole tuple
     all_links = list(dict.fromkeys(all_links)) #potentially two topics have same link; remove from list
     return all_links
 

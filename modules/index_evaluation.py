@@ -143,5 +143,5 @@ def delete_existing_data_basis(module):
 
 
 if __name__ == '__main__':
-    #add_data_basis()
-    add_second_index()
+    add_data_basis()
+    #add_second_index()

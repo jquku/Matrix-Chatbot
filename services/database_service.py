@@ -36,22 +36,21 @@ def check_if_student_is_existing(name):
     return True
 
 def get_user_chatbot_id(user_name):
+    print("USER NAME: " + str(user_name))
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM user_chatbot WHERE name = %s", [user_name])
     query_result = cursor.fetchone()
+    print("USER CHATBOT ID RESULT: " + str(query_result))
     query_result = query_result[0]
-    print("GET USER CHATBOT ID: " + str(query_result))
     return query_result
 
 def get_module_id(module):
-    print("MODULE NAME: " + str(module))
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM module WHERE name = %s", [module])
     query_result = cursor.fetchone()
     query_result = query_result[0]
-    print("GET MODULE ID: " + str(query_result))
     return query_result
 
 def create_new_room(room_id, room_name, user_name):
@@ -96,7 +95,6 @@ def add_new_module(name, original, source):
     connection.commit()
     module_id = cursor.fetchone()
     module_id = module_id[0]
-    print("MODULE ID: " + str(module_id))
     cursor.close()
     connection.close()
     return module_id
@@ -104,16 +102,65 @@ def add_new_module(name, original, source):
 def data_basis_query(keywords):
     if len(keywords) == 0:
         return []
+    module_general_id = get_module_general_id()
     connection = connect_to_database()
     cursor = connection.cursor()
-    query = "SELECT topic, link FROM data_basis WHERE topic LIKE '%" + keywords[0] + "%'"
+    query = "SELECT topic, link FROM data_basis WHERE module_id != " + str(module_general_id) + " AND original != 'Organisational'"
+    query = query + " AND topic LIKE '%" + keywords[0] + "%'"
     for i in range(1, len(keywords)):
-        query = query + " OR topic LIKE '%" + keywords[i] + "%'"
+        query = query + " OR module_id != " + str(module_general_id) + "  AND original != 'Organisational' AND topic LIKE '%" + keywords[i] + "%'"
     cursor.execute(query)
     links = cursor.fetchall()    #returns tuple
     cursor.close()
     connection.close()
     return links
+
+def data_basis_query_small_talk(keywords):
+    print("keyowrds:" + str(keywords))
+    print("calling the method")
+    if len(keywords) == 0:
+        return []
+    module_general_id = get_module_general_id()
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    query = "SELECT topic, link FROM data_basis WHERE module_id = " + str(module_general_id)
+    query = query + " AND topic LIKE '%" + keywords[0] + "%'"
+    for i in range(1, len(keywords)):
+        query = query + " OR module_id = " + str(module_general_id) + " AND topic LIKE '%" + keywords[i] + "%'"
+    cursor.execute(query)
+    links = cursor.fetchall()    #returns tuple
+    print("links: " + str(links))
+    cursor.close()
+    connection.close()
+    return links
+
+def data_basis_query_organisational(keywords):
+    if len(keywords) == 0:
+        return []
+    module_general_id = get_module_general_id()
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    query = "SELECT topic, link FROM data_basis WHERE module_id != " + str(module_general_id) + " AND original = 'Organisational'"
+    query = query + " AND topic LIKE '%" + keywords[0] + "%'"
+    for i in range(1, len(keywords)):
+        query = query + " OR module_id != " + str(module_general_id) + "  AND original = 'Organisational' AND topic LIKE '%" + keywords[i] + "%'"
+    cursor.execute(query)
+    links = cursor.fetchall()    #returns tuple
+    cursor.close()
+    connection.close()
+    return links
+
+def get_module_general_id():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id FROM module WHERE name = 'general'")
+    result = cursor.fetchall()
+    print("result:" + str(result))
+    result = str(result[0][0])
+    #result = str(result[0])
+    cursor.close()
+    connection.close()
+    return result
 
 def get_number_of_links_to_be_shown(user):
     connection = connect_to_database()
@@ -121,6 +168,7 @@ def get_number_of_links_to_be_shown(user):
     cursor.execute("SELECT links_preferred FROM user_chatbot WHERE name = %s", [user])
     result = cursor.fetchall()
     result = str(result[0][0])
+    #result = str(result[0])
     cursor.close()
     connection.close()
     return result
@@ -305,7 +353,6 @@ def update_modul_satisfaction(module, factor):
 
 def update_last_module_of_user(user, last_module):
     last_module = get_module_id(last_module)
-    print("LAST MODULE: " + str(last_module))
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("UPDATE user_chatbot SET last_module = %s WHERE name = %s", [last_module, user])
@@ -318,7 +365,6 @@ def get_last_module_of_user(user):
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM module join (SELECT last_module FROM user_chatbot WHERE name = %s) m on m.last_module=module.id",[user])
     last_module = cursor.fetchone()
-    print("MODULE ID while getting last module, text in list ok: " + str(last_module))
     cursor.close()
     connection.close()
     return last_module
@@ -341,11 +387,11 @@ def get_module_name_based_on_id(module_id):
     connection.close()
     return module
 
-def add_organisation_document_to_db(module, original):
+def add_organisation_entry(module, original, topic, response):
     module_id = get_module_id(module)
     connection = connect_to_database()
     cursor = connection.cursor()
-    cursor.execute("INSERT INTO data_basis(module_id, original, topic, link) VALUES (%s, %s, 'Organisation', '')", [module_id, original])
+    cursor.execute("INSERT INTO data_basis(module_id, original, topic, link) VALUES (%s, %s, %s, %s)", [module_id, original, topic, response])
     connection.commit()
     cursor.close()
     connection.close()
@@ -436,7 +482,6 @@ def check_if_link_belongs_to_module(link):
     return module
 
 def add_salt_value(value):
-    print("ABOUT TO ADD VALUE")
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("INSERT INTO salt(value) VALUES (%s)", [value])
@@ -456,7 +501,6 @@ def get_salt_value():
 def change_student_language(user, language):
     connection = connect_to_database()
     cursor = connection.cursor()
-    print("USER: " + str(user) + " neue Sprache: " + str(language))
     cursor.execute("UPDATE user_chatbot SET language = %s WHERE name = %s", [language, user])
     connection.commit()
     cursor.close()
@@ -470,3 +514,20 @@ def get_student_language(user):
     cursor.close()
     connection.close()
     return language
+
+def check_if_general_module_existing():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT id FROM module WHERE name = 'general'")
+    existing = cursor.fetchone()
+    cursor.close()
+    connection.close()
+    return existing
+
+def add_small_talk_document_to_data_basis(module_id, original, topic, link):
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO data_basis(module_id, original, topic, link) VALUES (%s, %s, %s, %s)", [module_id, original, topic, link])
+    connection.commit()
+    cursor.close()
+    connection.close()

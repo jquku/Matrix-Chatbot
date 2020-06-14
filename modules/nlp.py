@@ -21,18 +21,18 @@ from services.database_service import data_basis_query, get_number_of_links_to_b
 
 def language_processing(message):
     lowercased = lowercase(message)
-
+    #print("LOWERCASED: " + str(lowercased))
     remove_noises = noise_removal(lowercased)
-
+    #print("REMOVE NOISES: " + str(remove_noises))
     tokens = tokenization(remove_noises)
-
+    #print("TOKENS: " + str(tokens))
     after_lemmitation = lemmatization(tokens)
-
+    #print("AFTER LEMMITATION: " + str(after_lemmitation))
     without_stop_words = remove_stop_words(after_lemmitation)
-
+    #print("WITHOUT STOP WORDS: " + str(without_stop_words))
     final_message = remove_spelling_errors(without_stop_words)
-
-    return lowercased, final_message, tokens    #returns tuple
+    #print("FINAL MESSAGE: " + str(final_message))
+    return lowercased, final_message, tokens, after_lemmitation    #returns tuple
 
 #lowercasing every letter in string
 def lowercase(text):

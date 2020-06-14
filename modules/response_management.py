@@ -14,14 +14,14 @@ def generate_response(user, message, original_message):
     number_of_links = message[3]
     show_more = message[4]
     show_all = message[5]
-    greetings = message[6]
-    goodbyes = message[7]
-    stats_called = message[8]
-    message_contains_yes_or_no = message[9]
-    changed_number_of_stats = message[10]
-    change_language = message[11]
-    links_from_multiple_modules = message[12]
-    links = message[13]
+    stats_called = message[6]
+    message_contains_yes_or_no = message[7]
+    changed_number_of_stats = message[8]
+    change_language = message[9]
+    links_from_multiple_modules = message[10]
+    links = message[11]
+    small_talk = message[12]
+    organisational = message[13]
 
     response = ""
     number_of_links_found = len(links)
@@ -47,9 +47,12 @@ def generate_response(user, message, original_message):
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
-    #step 3: add greeting if necessary
-    if greetings == True:
-        response = "Hi! "
+    #step 3: small talk
+    if len(small_talk) > 0:
+        response = response + small_talk[0]
+
+    if len(organisational) > 0:
+        response = response + organisational[0] + "\n"
 
     #step 4: return statistics if called
     if stats_called != False:
@@ -112,6 +115,7 @@ def generate_response(user, message, original_message):
                 response = response + links[i] +  "\n" +  "\n"
             else:
                 break
+
         #step 7: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
         #print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
@@ -142,25 +146,6 @@ def generate_response(user, message, original_message):
                     create_new_message(user, original_message, lowercase_only, "", response)
                     return response
 
-
-    #step 9: check if user wants to access the document with organisation infos
-    if message_contains_yes_or_no == 1:
-        last_message = get_last_message(user)[0]
-        if language_of_user == "english":
-            organisation_string = "Do you want to access the organisation infos?"
-        else:
-            organisation_string = "Willst du die organisatorischen Infos abrufen?"
-        if organisation_string in last_message:
-            last_module = get_last_module_of_user(user)[0]
-            organisation_text = get_organisation_text(last_module)
-            if organisation_text != None:
-                organisation_text = organisation_text[0]
-                response = response + organisation_text.rstrip()
-
-    #step 10: add goodbye if necessary
-    if goodbyes == True:
-        response = response + "Bye!"
-
     #step 11: check if default answer is necessary
     if response == "":
         #print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
@@ -171,9 +156,9 @@ def generate_response(user, message, original_message):
         #    if helpful_string_english in last_message or helpful_string_german in last_message:
         #        return response
         if language_of_user == "english":
-            default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about. Do you want to access the organisation infos?"
+            default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
         else:
-            default_answer = "Ich bin ein Chatbot, dein digitaler Lernassistent. Über welches Vorlesungsthema willst du Bescheid wissen? Willst du die organisatorischen Infos abrufen?"
+            default_answer = "Ich bin ein Chatbot, dein digitaler Lernassistent. Über welches Vorlesungsthema willst du Bescheid wissen?"
         response = default_answer
     #print("LINKS TYPE: " + str(type(links)))
 

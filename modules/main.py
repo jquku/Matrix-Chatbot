@@ -59,49 +59,51 @@ async def message_cb(room, event):
     room_display_name = room.display_name
     student_name = room.user_name(event.sender)
 
-    #hasing of the user name with salt
-    salt_value = get_salt_value()
-    if salt_value == None:
-        salt_value = uuid.uuid4().hex
-        add_salt_value(salt_value)
-    else:
-        salt_value = salt_value[0]
-    salt_value = salt_value.encode('utf-8')
-    student_name = student_name.encode('utf-8')
-    hashed_user_name = hashlib.sha512(student_name + salt_value).hexdigest()
-    student_name = hashed_user_name
+    if student_name != "riot_chatbot":
 
-    message_body = event.body
+        #hasing of the user name with salt
+        salt_value = get_salt_value()
+        if salt_value == None:
+            salt_value = uuid.uuid4().hex
+            add_salt_value(salt_value)
+        else:
+            salt_value = salt_value[0]
+        salt_value = salt_value.encode('utf-8')
+        student_name = student_name.encode('utf-8')
+        hashed_user_name = hashlib.sha512(student_name + salt_value).hexdigest()
+        student_name = hashed_user_name
 
-    event_timestamp = event.server_timestamp #tiestamp in ms (unix time)
-    current_timestamp = int(round(time.time() * 1000))
-    timestamp_difference = current_timestamp - event_timestamp
+        message_body = event.body
 
-    #print("timestamp difference: " + str(timestamp_difference))
-    if timestamp_difference > 10000: #10s difference = new message
-        print("old")
-    else:
-        print("NEW MESSAGE")
-        if check_if_room_is_existing(room_id) == False:
-            create_new_room(room_id, room_display_name, student_name)
+        event_timestamp = event.server_timestamp #tiestamp in ms (unix time)
+        current_timestamp = int(round(time.time() * 1000))
+        timestamp_difference = current_timestamp - event_timestamp
 
-        if check_if_student_is_existing(student_name) == False:
-            create_new_student(student_name, "operating systems (os)")   #default: show 2 links
+        #print("timestamp difference: " + str(timestamp_difference))
+        if timestamp_difference > 10000: #10s difference = new message
+            print("old")
+        else:
+            print("NEW MESSAGE")
+            if check_if_student_is_existing(student_name) == False:
+                create_new_student(student_name, "operating systems (os)")   #default: show 2 links
 
-        global lastSender
-        global lastResponse
+            if check_if_room_is_existing(room_id) == False:
+                create_new_room(room_id, room_display_name, student_name)
 
-        if str(lastSender) != str(student_name) or str(lastResponse) != str(message_body):
+            global lastSender
+            global lastResponse
 
-            processed_message = language_processing(message_body)
-            evaluation = evaluate_message(student_name, processed_message)
-            response = generate_response(student_name, evaluation, message_body)
+            if str(lastSender) != str(student_name) or str(lastResponse) != str(message_body):
 
-            if response != "":
-                await sendMessage(room_id, response, student_name)
+                processed_message = language_processing(message_body)
+                evaluation = evaluate_message(student_name, processed_message)
+                response = generate_response(student_name, evaluation, message_body)
+
+                if response != "":
+                    await sendMessage(room_id, response, student_name)
 
 async def main():
-    #create_tables()
+    create_tables()
     #add_data_basis()
     #add_organisation_document()
     await client.login("chatbot123")
