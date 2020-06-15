@@ -69,45 +69,38 @@ def help_called(message):
     return False
 
 def change_standard_number_of_links_called(user, message):
-
-    if "links = " in message or "link = " in message or "links= " in message or "link=" in message:
-
-        number = re.findall(r'\d+', message)
-
-        if len(number) == 1:
-            number = number[0]
-            set_number_of_links_to_be_shown(user, number)
-            return True
-    else:
-        return False
+    if "links" in message or "link" in message or "Links" in message or "Link" in message:
+        if "=" in message:
+            number = re.findall(r'\d+', message)
+            if len(number) == 1:
+                number = number[0]
+                set_number_of_links_to_be_shown(user, number)
+                return True
+    return False
 
 def change_number_of_stats_to_return(user, message):
-    if "stats = " in message or "stat = " in message or "stats= " in message or "stat=" in message:
-
-        number_of_stats = re.findall(r'\d+', message)
-        number_of_stats = number_of_stats[0]
-        change_stats_preferred(user, number_of_stats)
-        return True
-    else:
-        return False
+    if "stats" in message or "stat" in message or "Stats" in message or "Stat" in message:
+        if "=" in message:
+            number_of_stats = re.findall(r'\d+', message)
+            if number_of_stats != None:
+                number_of_stats = number_of_stats[0]
+                change_stats_preferred(user, number_of_stats)
+                return True
+    return False
 
 def change_user_language(user, message):
-    if "language = " in message or "language=" in message or "lang =" in message or "lang=" in message or "sprache=" in message or "sprache =" in message:
+    if "language" in message or "Language" in message or "sprache" in message or "Sprache" in message:
 
-        if "en" in message or "american" in message:
-            change_student_language(user, 'english')
-            return True
+        if "=" in message:
 
-        if "ger" in message or "de" in message:
-            print("DEUTSCH")
-            change_student_language(user, 'german')
-            return True
+            if "en" in message or "american" in message:
+                change_student_language(user, 'english')
+                return True
 
-        else:
-            return False
-
-    else:
-        return False
+            if "ger" in message or "de" in message:
+                change_student_language(user, 'german')
+                return True
+    return False
 
 def show_more_called(message):
 

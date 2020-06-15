@@ -12,7 +12,7 @@ sys.path.append("./../")    #allows python interpreter to find modules
 
 
 from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
-    ToDeviceMessage, RoomMessagesResponse, RoomRedactResponse)
+    ToDeviceMessage, RoomMessagesResponse, RoomRedactResponse, InviteEvent)
 
 from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
@@ -102,6 +102,10 @@ async def message_cb(room, event):
                 if response != "":
                     await sendMessage(room_id, response, student_name)
 
+#auto join rooms
+async def auto_join_room_cb(room, event):
+    await client.join(room.room_id)
+
 async def main():
     create_tables()
     #add_data_basis()
@@ -110,6 +114,8 @@ async def main():
     print("after login")
 
     client.add_event_callback(message_cb, RoomMessageText)
+    client.add_event_callback(auto_join_room_cb, InviteEvent)
+
     await client.sync_forever(timeout=30000) #always sync with server
 
 asyncio.get_event_loop().run_until_complete(main())
