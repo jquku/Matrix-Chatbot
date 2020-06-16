@@ -11,6 +11,8 @@ wer bist du-Ich bin dein digitaler Lernassistent.
 wie geht's-Sehr gut.
 wie gehts dir-Sehr gut.
 wie alt bist du-Alt genug.
+wie alt-Alt genug.
+wie viele jahre auf buckel-Zu viele.
 hast du geschiwster-Nein.
 Lieblingsfarbe-Ich mag alle Farben.
 mast du mich-Klar.

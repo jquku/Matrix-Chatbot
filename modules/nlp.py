@@ -5,6 +5,8 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from spellchecker import SpellChecker
+from nltk.corpus import brown
+from autocorrect import Speller
 
 sys.path.append("./../")
 #nltk.download()
@@ -58,16 +60,17 @@ def lemmatization(tokens):
         lemmatization_list.append(lemmatized)
     return lemmatization_list
 
-def remove_stop_words(list):
+def remove_stop_words(list):    #removal of german and english stop words
     stop_words_english = set(stopwords.words('english'))
     stop_words_german = set(stopwords.words('german'))
-    filtered_list = [w for w in list if not w in stop_words_english
-        and stop_words_german]
+    filtered_list = [w for w in list if not w in stop_words_english]
+    filtered_list = [w for w in filtered_list if not w in stop_words_german]
     return filtered_list
 
 def remove_spelling_errors(list):
-    spell = SpellChecker()
+    spell = Speller()
     new_list = []
     for word in list:
-        new_list.append(spell.correction(word))
+        word_new = spell(word)
+        new_list.append(word_new)
     return new_list

@@ -40,7 +40,7 @@ def evaluate_message(user, message):
     print("after lemmitation: " + str(after_lemmitation))
     small_talk = data_basis_query_small_talk(after_lemmitation)
     print("small talk before: " + str(small_talk))
-    small_talk = sort_links_by_matching_general(small_talk, after_lemmitation, 75)
+    small_talk = sort_links_by_matching_general(small_talk, after_lemmitation, 65)
     print("small talk after: " + str(small_talk))
     if len(small_talk) > 0:
         small_talk = [small_talk[0]]
@@ -104,15 +104,17 @@ def change_user_language(user, message):
 
 def show_more_called(message):
 
-    if "show more" in message or "zeig mehr" in message:
-        return True
+    if "show" in message or "zeig" in message:
+        if "more" in message or "mehr" in message:
+            return True
     else:
         return False
 
 def show_all_called(message):
 
-    if "show all" in message or "zeig alles" in message:
-        return True
+    if "show" in message or "zeig" in message:
+        if "all" in message or "alles" in message:
+            return True
     else:
         return False
 
