@@ -1,4 +1,5 @@
 import sys
+import random
 
 sys.path.append("./../")
 
@@ -156,10 +157,17 @@ def generate_response(user, message, original_message):
         #    if helpful_string_english in last_message or helpful_string_german in last_message:
         #        return response
         if language_of_user == "english":
-            default_answer = "I'm a chatbot serving as your digital learning assistant. Tell me which topic you want to know more about."
+            default_1 = "Can you please specify your question?"
+            default_2 = "I haven't found anything fitting."
+            default_3 = "I've found no match to your question."
+            default_4 = "I can't answer that."
         else:
-            default_answer = "Ich bin ein Chatbot, dein digitaler Lernassistent. Über welches Vorlesungsthema willst du Bescheid wissen?"
-        response = default_answer
+            default_1 = "Kannst du deine Frage bitte spezifizieren?"
+            default_2 = "Ich kenne keine passende Antwort."
+            default_3 = "Ich habe keine Übereinstimmung gefunden."
+            default_4 = "Das kann ich nicht beantworten."
+        default_answer = [default_1, default_2, default_3, default_4]
+        response = random.choice(default_answer)
     #print("LINKS TYPE: " + str(type(links)))
 
     all_links_db = list_to_string(links)

@@ -16,7 +16,7 @@ from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
 
 from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
-from services.database_service import get_salt_value, add_salt_value
+from services.database_service import get_salt_value, add_salt_value, check_if_room_is_existing
 from nlp import language_processing
 from response_management import generate_response
 from message_evaluation import evaluate_message
@@ -29,12 +29,12 @@ import hashlib, uuid
 lastResponse = ""   #global variables
 lastSender = ""
 
-client = AsyncClient("https://matrix.org", "@riot_chatbot:matrix.org")
+joined_room = ""
+
+client = AsyncClient("https://matrix.org", "@neo-wwu:matrix.org")
 
 
-async def sendMessage(room_id, response, student_name):
-    #print("RESPONSE: " + str(response))
-
+async def sendMessage(room_id, response):
 
     await client.room_send(
         room_id=room_id,
@@ -48,7 +48,7 @@ async def sendMessage(room_id, response, student_name):
     global lastResponse
     global lastSender
     lastResponse = response
-    lastSender = "riot_chatbot"
+    lastSender = "neo-wwu"
     salt_value = get_salt_value()[0]
     salt_value = salt_value.encode('utf-8')
     lastSender = lastSender.encode('utf-8')
@@ -59,7 +59,7 @@ async def message_cb(room, event):
     room_display_name = room.display_name
     student_name = room.user_name(event.sender)
 
-    if student_name != "riot_chatbot":
+    if student_name != "neo-wwu":
 
         #hasing of the user name with salt
         salt_value = get_salt_value()
@@ -100,22 +100,29 @@ async def message_cb(room, event):
                 response = generate_response(student_name, evaluation, message_body)
 
                 if response != "":
-                    await sendMessage(room_id, response, student_name)
+                    await sendMessage(room_id, response)
 
 #auto join rooms
 async def auto_join_room_cb(room, event):
-    await client.join(room.room_id)
+    room_id = room.room_id
+    await client.join(room_id)
+    global joined_room
+    if joined_room != str(room_id):
+        standard_first_message = "Hi, I'm your chatbot helping you with whatever you need! Call 'help' to see all my options."
+        await sendMessage(room_id, standard_first_message)
+        joined_room = room_id
 
 async def main():
     create_tables()
     #add_data_basis()
     #add_organisation_document()
-    await client.login("chatbot123")
+    await client.login("johaiva123thaype")
     print("after login")
 
     client.add_event_callback(message_cb, RoomMessageText)
     client.add_event_callback(auto_join_room_cb, InviteEvent)
 
     await client.sync_forever(timeout=30000) #always sync with server
+
 
 asyncio.get_event_loop().run_until_complete(main())
