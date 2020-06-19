@@ -63,11 +63,7 @@ async def message_cb(room, event):
 
         #hasing of the user name with salt
         salt_value = get_salt_value()
-        if salt_value == None:
-            salt_value = uuid.uuid4().hex
-            add_salt_value(salt_value)
-        else:
-            salt_value = salt_value[0]
+        salt_value = salt_value[0]
         salt_value = salt_value.encode('utf-8')
         student_name = student_name.encode('utf-8')
         hashed_user_name = hashlib.sha512(student_name + salt_value).hexdigest()
@@ -106,6 +102,10 @@ async def message_cb(room, event):
 async def auto_join_room_cb(room, event):
     room_id = room.room_id
     await client.join(room_id)
+    salt_value = get_salt_value()
+    if salt_value == None:
+        salt_value = uuid.uuid4().hex
+        add_salt_value(salt_value)
     global joined_room
     if joined_room != str(room_id):
         standard_first_message = "Hi, I'm your chatbot helping you with whatever you need! Call 'help' to see all my options."
