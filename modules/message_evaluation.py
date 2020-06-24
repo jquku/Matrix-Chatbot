@@ -23,6 +23,7 @@ def evaluate_message(user, message):
     show_all = show_all_called(lowercase_only)
     stats_called_result = stats_called(only_tokens)
     message_contains_yes_or_no = check_if_message_contains_yes_or_no(only_tokens)
+    message_contains_thank_you = check_if_message_contains_thank_you(only_tokens)
     change_language = change_user_language(user, lowercase_only)
 
     #print("HELP: " + str(help))
@@ -36,19 +37,17 @@ def evaluate_message(user, message):
     links = data_basis_query(standardized_message)
     #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
     links = sort_links_by_matching(links, standardized_message)
-    print("standardized message: " + str(standardized_message))
-    print("after lemmitation: " + str(after_lemmitation))
+    #print("standardized message: " + str(standardized_message))
+    #print("after lemmitation: " + str(after_lemmitation))
     small_talk = data_basis_query_small_talk(after_lemmitation)
-    print("small talk before: " + str(small_talk))
+    #print("small talk before: " + str(small_talk))
     small_talk = sort_links_by_matching_general(small_talk, after_lemmitation, 65)
-    print("small talk after: " + str(small_talk))
+    #print("small talk after: " + str(small_talk))
     if len(small_talk) > 0:
         small_talk = [small_talk[0]]
 
     organisational = data_basis_query_organisational(after_lemmitation)
-    print("ORGANISATIONAL Before: " + str(organisational))
     organisational = sort_links_by_matching_general(organisational, after_lemmitation, 75)
-    print("ORGANISATIONAL: " + str(organisational))
 
     links_from_multiple_modules = check_if_links_from_multiple_modules(links)
     answer_given_for_multiple_modules = check_if_answer_for_results_from_multiple_modules_given(user, only_tokens)
@@ -56,7 +55,7 @@ def evaluate_message(user, message):
         links = answer_given_for_multiple_modules
         links_from_multiple_modules = False
     #print("LINKS FROM MULTIPLE MODULES: " + str(links_from_multiple_modules))
-    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, stats_called_result, message_contains_yes_or_no, changed_number_of_stats, change_language, links_from_multiple_modules, links, small_talk, organisational)
+    evaluation = (lowercase_only, standardized_message, help, number_of_links, show_more, show_all, stats_called_result, message_contains_yes_or_no, message_contains_thank_you, changed_number_of_stats, change_language, links_from_multiple_modules, links, small_talk, organisational)
     return evaluation
 
 def help_called(message):
@@ -149,6 +148,14 @@ def check_if_message_contains_yes_or_no(tokens):
             return -1   #-1 means no
     return False
 
+def check_if_message_contains_thank_you(tokens):
+    phrases = ['thank you', 'thanks', 'danke', 'dankeschön', 'vielen dank',
+        'lieben dank', 'thank you very much', 'thx', 'merci']
+    for i in range(0, len(tokens)):
+        if tokens[i] in phrases:
+            return True
+    return False
+
 def sort_links_by_matching(links, keywords):
 
     links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
@@ -214,7 +221,7 @@ def sort_links_by_matching(links, keywords):
 
 def sort_links_by_matching_general(links, keywords, value):
 
-    print("keyowrds: " + str(keywords))
+    #print("keyowrds: " + str(keywords))
     links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
     only_topic = []
     for i in range(0, len(links)):
@@ -236,7 +243,7 @@ def sort_links_by_matching_general(links, keywords, value):
         overlap = setA & setB
 
         matching = float(len(overlap)) / len(setB) * 100
-        print("MATCHING: " + str(matching))
+        #print("MATCHING: " + str(matching))
         if matching >= value:
 
             list_with_matching_coefficients.append(matching)

@@ -2,7 +2,6 @@ import asyncio
 import time
 from nio import AsyncClient
 from nio import Api
-#from nio import Api
 #from nio import register
 
 import sys

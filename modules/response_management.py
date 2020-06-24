@@ -17,12 +17,13 @@ def generate_response(user, message, original_message):
     show_all = message[5]
     stats_called = message[6]
     message_contains_yes_or_no = message[7]
-    changed_number_of_stats = message[8]
-    change_language = message[9]
-    links_from_multiple_modules = message[10]
-    links = message[11]
-    small_talk = message[12]
-    organisational = message[13]
+    message_contains_thank_you = message[8]
+    changed_number_of_stats = message[9]
+    change_language = message[10]
+    links_from_multiple_modules = message[11]
+    links = message[12]
+    small_talk = message[13]
+    organisational = message[14]
 
     response = ""
     number_of_links_found = len(links)
@@ -50,12 +51,19 @@ def generate_response(user, message, original_message):
 
     #step 3: small talk
     if len(small_talk) > 0:
-        response = response + small_talk[0]
+        response = response + small_talk[0] + " "
 
     if len(organisational) > 0:
         response = response + organisational[0] + "\n"
 
-    #step 4: return statistics if called
+    #step 4: add you're welcome if user thanked chatbot
+    if message_contains_thank_you == True:
+        if language_of_user == "english":
+            response = response + "You're welcome. "
+        else:
+            response = response + "Bitte. "
+
+    #step 5: return statistics if called
     if stats_called != False:
         output_stats = get_stats(stats_called)  #returns sorted list of topics + questions
         if language_of_user == "english":
@@ -74,7 +82,7 @@ def generate_response(user, message, original_message):
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
-    #step 5: check if show more or show all is called
+    #step 6: check if show more or show all is called
     if show_more == True:
         links_last_message_more = get_next_links(user)
         response = response + links_last_message_more
@@ -84,7 +92,7 @@ def generate_response(user, message, original_message):
         #TUPLE
         response = response + links_last_message_all[0]
 
-    #step 6: add links if necessary
+    #step 7: add links if necessary
     if number_of_links_found > 0:
 
         if links_from_multiple_modules != False:
@@ -117,7 +125,7 @@ def generate_response(user, message, original_message):
             else:
                 break
 
-        #step 7: add "is my answer helpful" after every 5th link interaction
+        #step 8: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
         #print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
         if counter[0] % 5 == 0:    #every 5th link interaction added by "is my answer helpful"
@@ -126,13 +134,13 @@ def generate_response(user, message, original_message):
             else:
                 response = response + "War meine Antwort hilfreich?"
 
-    #step 8: check if student answered with yes or no if answer was helpful
+    #step 9: check if student answered with yes or no if answer was helpful
     else:
         if message_contains_yes_or_no != False:
             counter = get_links_counter_for_helpful(user)
             if counter[0] % 5 == 0:
                 last_message = get_last_message(user)[0]
-                print("LAST MESSAGE: " + str(last_message))
+                #print("LAST MESSAGE: " + str(last_message))
                 helpful_string_english = "Is my answer helpful?"
                 helpful_string_german = "War meine Antwort hilfreich?"
                 if helpful_string_english in last_message or helpful_string_german in last_message:
@@ -147,7 +155,7 @@ def generate_response(user, message, original_message):
                     create_new_message(user, original_message, lowercase_only, "", response)
                     return response
 
-    #step 11: check if default answer is necessary
+    #step 10: check if default answer is necessary
     if response == "":
         #print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
         if message_contains_yes_or_no != False:

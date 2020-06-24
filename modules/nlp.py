@@ -4,7 +4,6 @@ import re
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
-from spellchecker import SpellChecker
 from nltk.corpus import brown
 from autocorrect import Speller
 
