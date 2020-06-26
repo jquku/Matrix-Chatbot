@@ -112,7 +112,7 @@ async def auto_join_room_cb(room, event):
         joined_room = room_id
 
 async def main():
-    create_tables()
+    #create_tables()
     #add_data_basis()
     #add_organisation_document()
     await client.login("johaiva123thaype")
