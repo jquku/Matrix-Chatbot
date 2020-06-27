@@ -15,7 +15,7 @@ from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
 
 from models.database import create_tables
 from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
-from services.database_service import get_salt_value, add_salt_value, check_if_room_is_existing
+from services.database_service import get_salt_value, add_salt_value, check_if_room_is_existing, get_all_modules_original
 from nlp import language_processing
 from response_management import generate_response
 from message_evaluation import evaluate_message
@@ -107,12 +107,22 @@ async def auto_join_room_cb(room, event):
         add_salt_value(salt_value)
     global joined_room
     if joined_room != str(room_id):
-        standard_first_message = "Hi, I'm your chatbot helping you with whatever you need! Call 'help' to see all my options."
+
+        all_modules = get_all_modules_original()
+        string_with_modules = ""
+        for i in range(0, len(all_modules)):
+            current = all_modules[i][0]
+            if current != "General":
+                if string_with_modules == "":
+                    string_with_modules = string_with_modules + current
+                else:
+                    string_with_modules = string_with_modules + ", " + current
+
+        standard_first_message = "Hi, I'm your chatbot helping you with whatever you need! I've information about the following modules: " + string_with_modules + "\nCall 'help' to see all my options."
         await sendMessage(room_id, standard_first_message)
         joined_room = room_id
 
 async def main():
-    #create_tables()
     #add_data_basis()
     #add_organisation_document()
     await client.login("johaiva123thaype")

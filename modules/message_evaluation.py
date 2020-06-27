@@ -3,7 +3,7 @@ import re
 
 sys.path.append("./../")
 
-from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_all_modules
+from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links
 from services.database_service import get_original_topic, check_if_topic_already_in_statistic, create_new_statistic_entry, increment_statistic_topic_counter, get_stats
 from services.database_service import change_stats_preferred, links_from_multiple_modules, get_last_message, get_all_modules, get_all_links_of_last_response
 from services.database_service import check_if_link_belongs_to_module, change_student_language, get_module_name_based_on_id

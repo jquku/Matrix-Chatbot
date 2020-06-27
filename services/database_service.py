@@ -3,7 +3,6 @@ import re
 
 import psycopg2
 
-
 def connect_to_database():
     connection = psycopg2.connect(
         database = "postgres",
@@ -280,20 +279,6 @@ def increment_statistic_topic_counter(module, topic):
     cursor.close()
     connection.close()
 
-def get_all_modules():
-    connection = connect_to_database()
-    cursor = connection.cursor()
-    cursor.execute("SELECT name FROM module")
-    output = cursor.fetchall()
-
-    new_output = []     #clean up original output
-    for i in range(0, len(output)):
-        new_output.append(output[i][0])
-
-    cursor.close()
-    connection.close()
-    return
-
 def get_module_id_for_stats(module):
     connection = connect_to_database()
     cursor = connection.cursor()
@@ -457,6 +442,15 @@ def get_all_modules():
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT name FROM module")
+    all_modules = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return all_modules
+
+def get_all_modules_original():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT original FROM module")
     all_modules = cursor.fetchall()
     cursor.close()
     connection.close()
