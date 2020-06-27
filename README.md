@@ -1,10 +1,10 @@
 # Matrix-Chatbot
 
-This natural language processing matrix-chatbot is designed for Riot.im and is based on the matrix.nio client libary. The chatbot can be used as a digital learning assistant for students. 
+This natural language processing matrix-chatbot is designed for Riot.im and is based on the matrix.nio client libary. The chatbot can be used as a digital learning assistant for students.
 Knowledge extension is achieved by simply adding new rules in predetermined files that serve as a data basis for the chatbot. The application offers a statistical overview of frequently asked topics, which can be queried directly via the chatbot.
 
 ## Perequisites
-- python3
+- python version 3.5+
 - pip3
 - docker.io
 - docker-compose
@@ -42,6 +42,6 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
    python3 index_evaluation.py
    python3 organisational_document.py
    python3 small_talk_evaluation.py
-9. Start the chatbot 
+9. Start the chatbot
    ```console
    python3 main.py
