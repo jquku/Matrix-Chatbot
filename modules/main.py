@@ -97,7 +97,7 @@ async def message_cb(room, event):
 
         #print("timestamp difference: " + str(timestamp_difference))
         #ignore old events
-        if timestamp_difference < 10000:
+        if timestamp_difference < 20000:
             print("New message event: " + str(message_body))
             if check_if_student_is_existing(student_name) == False:
                 create_new_student(student_name, "operating systems (os)")   #default: show 2 links
