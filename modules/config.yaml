@@ -1,0 +1,11 @@
+matrix:
+  user_id: "@neo-wwu:matrix.org"
+  user_password: "johaiva123thaype"
+  homeserver_url: "https://matrix.org"
+
+database:
+  name: "postgres"
+  user: "postgres"
+  password: "postgres"
+  host: "localhost"
+  port: "5432"

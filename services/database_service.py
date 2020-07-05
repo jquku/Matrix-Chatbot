@@ -1,15 +1,19 @@
 import sys
 import re
-
 import psycopg2
+
+from config import Config
+
+config_filepath = "config.yaml"
+config = Config(config_filepath)
 
 def connect_to_database():
     connection = psycopg2.connect(
-        database = "postgres",
-        user = "postgres",
-        password = "postgres",
-        host = "localhost",
-        port = "5432")
+        database = config.name,
+        user = config.user,
+        password = config.password,
+        host = config.host,
+        port = config.port)
     return connection
 
 def check_if_room_is_existing(room_id):
@@ -35,12 +39,12 @@ def check_if_student_is_existing(name):
     return True
 
 def get_user_chatbot_id(user_name):
-    print("USER NAME: " + str(user_name))
+    #print("USER NAME: " + str(user_name))
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM user_chatbot WHERE name = %s", [user_name])
     query_result = cursor.fetchone()
-    print("USER CHATBOT ID RESULT: " + str(query_result))
+    #print("USER CHATBOT ID RESULT: " + str(query_result))
     query_result = query_result[0]
     return query_result
 
@@ -525,3 +529,12 @@ def add_small_talk_document_to_data_basis(module_id, original, topic, link):
     connection.commit()
     cursor.close()
     connection.close()
+
+def get_room_ids():
+    connection = connect_to_database()
+    cursor = connection.cursor()
+    cursor.execute("SELECT room_id FROM room")
+    ids = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return ids

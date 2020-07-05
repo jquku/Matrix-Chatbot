@@ -3,3 +3,4 @@ requests
 nltk
 autocorrect
 beautifulsoup4
+aiofiles==0.4.0

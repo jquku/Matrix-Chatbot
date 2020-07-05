@@ -1,37 +1,63 @@
 import asyncio
 import time
-from nio import AsyncClient
-from nio import Api
-#from nio import register
-
 import sys
+import hashlib
+import uuid
 
-#sys.path.append("/home/jonathan/Studium/Semester6/Bachelorarbeit/Chatbot/chatbot/")
 sys.path.append("./../")    #allows python interpreter to find modules
 
-
-from nio import (SyncResponse, RoomMessageText, FullyReadEvent,
-    ToDeviceMessage, RoomMessagesResponse, RoomRedactResponse, InviteEvent)
-
+from nio import (AsyncClient, AsyncClientConfig, RoomMessageText,
+    InviteEvent, RoomMessageImage, RoomMessageMedia)
 from models.database import create_tables
-from services.database_service import check_if_room_is_existing, check_if_student_is_existing, create_new_room, create_new_student, create_new_message, get_number_of_links_to_be_shown
-from services.database_service import get_salt_value, add_salt_value, check_if_room_is_existing, get_all_modules_original
+from services.database_service import (check_if_room_is_existing,
+    check_if_student_is_existing, create_new_room, create_new_student,
+    create_new_message, get_number_of_links_to_be_shown, get_salt_value,
+    add_salt_value, check_if_room_is_existing, get_all_modules_original,
+    get_room_ids)
 from nlp import language_processing
 from response_management import generate_response
 from message_evaluation import evaluate_message
-from index_evaluation import add_data_basis
 from organisational_document import add_organisation_document
+from config import Config
 
-#for hashing
-import hashlib, uuid
+#from aiofiles import *
 
-lastResponse = ""   #global variables
-lastSender = ""
+#set filepath of config file
+config_filepath = "config.yaml"
+config = Config(config_filepath)
 
-joined_room = ""
+#AsyncClient configuration options
+client_config = AsyncClientConfig(
+    max_limit_exceeded=0,
+    max_timeouts=0,
+    store_sync_tokens=True,
+    encryption_enabled=True,
+)
 
-client = AsyncClient("https://matrix.org", "@neo-wwu:matrix.org")
+#initialize matrix client
+client = AsyncClient(
+    config.homeserver_url,
+    config.user_id,
+    config=client_config,
+)
 
+async def main():
+    #client login
+    await client.login(password=config.user_password)
+    print("after login")
+
+    #add event callbacks
+    client.add_event_callback(message_cb, RoomMessageText)
+    client.add_event_callback(auto_join_room_cb, InviteEvent)
+
+    #sync encryption keys with the server, for encrypted rooms
+    if client.should_upload_keys:
+        await client.keys_upload()
+
+    await client.sync_forever(timeout=30000, full_state=True)
+
+    #close client connection on disconnect
+    await client.close()
 
 async def sendMessage(room_id, response):
 
@@ -44,21 +70,17 @@ async def sendMessage(room_id, response):
         }
     )
 
-    global lastResponse
-    global lastSender
-    lastResponse = response
-    lastSender = "neo-wwu"
-    salt_value = get_salt_value()[0]
-    salt_value = salt_value.encode('utf-8')
-    lastSender = lastSender.encode('utf-8')
-    lastSender = hashlib.sha512(lastSender + salt_value).hexdigest()
-
 async def message_cb(room, event):
+
     room_id = str(room.room_id)
     room_display_name = room.display_name
     student_name = room.user_name(event.sender)
 
-    if student_name != "neo-wwu":
+    #ignore own messages
+    if event.sender == client.user:
+        return
+
+    else:
 
         #hasing of the user name with salt
         salt_value = get_salt_value()
@@ -75,7 +97,8 @@ async def message_cb(room, event):
         timestamp_difference = current_timestamp - event_timestamp
 
         #print("timestamp difference: " + str(timestamp_difference))
-        if timestamp_difference > 10000: #10s difference = new message
+        #ignore old events
+        if timestamp_difference > 10000:
             print("old")
         else:
             print("NEW MESSAGE")
@@ -85,28 +108,34 @@ async def message_cb(room, event):
             if check_if_room_is_existing(room_id) == False:
                 create_new_room(room_id, room_display_name, student_name)
 
-            global lastSender
-            global lastResponse
+            #process message
+            processed_message = language_processing(message_body)
+            evaluation = evaluate_message(student_name, processed_message)
+            response = generate_response(student_name, evaluation, message_body)
 
-            if str(lastSender) != str(student_name) or str(lastResponse) != str(message_body):
-
-                processed_message = language_processing(message_body)
-                evaluation = evaluate_message(student_name, processed_message)
-                response = generate_response(student_name, evaluation, message_body)
-
-                if response != "":
-                    await sendMessage(room_id, response)
+            if response != "":
+                #send response
+                await sendMessage(room_id, response)
 
 #auto join rooms
 async def auto_join_room_cb(room, event):
+
     room_id = room.room_id
+
+    room_ids = get_room_ids()
+    all_room_ids = []
+    for i in range(0, len(room_ids)):
+        all_room_ids.append(room_ids[i][0])
+
+    #check if room was already joined
+    if room_id in all_room_ids:
+        return
+
     await client.join(room_id)
     salt_value = get_salt_value()
     if salt_value == None:
         salt_value = uuid.uuid4().hex
         add_salt_value(salt_value)
-    global joined_room
-    if joined_room != str(room_id):
 
         all_modules = get_all_modules_original()
         string_with_modules = ""
@@ -119,19 +148,25 @@ async def auto_join_room_cb(room, event):
                     string_with_modules = string_with_modules + ", " + current
 
         standard_first_message = "Hi, I'm your chatbot helping you with whatever you need! I've information about the following modules: " + string_with_modules + "\nCall 'help' to see all my options."
-        await sendMessage(room_id, standard_first_message)
-        joined_room = room_id
+        #await sendMessage(room_id, standard_first_message)
 
-async def main():
-    #add_data_basis()
-    #add_organisation_document()
-    await client.login("johaiva123thaype")
-    print("after login")
-
-    client.add_event_callback(message_cb, RoomMessageText)
-    client.add_event_callback(auto_join_room_cb, InviteEvent)
-
-    await client.sync_forever(timeout=30000) #always sync with server
-
+        #file_stat = await aiofiles.stat("topics.png")
+        #async with aiofiles.open("topics.png", "r+b") as f:
+        #    resp, maybe_keys = await client.upload(
+        #        f,
+        #        content_type="image/png",
+        #        filename="topics.png",
+        #        filesize=file_stat.st_size()
+        #    )
+        print("AUTO JOIN")
+        await client.room_send(
+            room_id=room_id,
+            message_type="m.room.message",
+            content = {
+                "msgtype": "m.file",
+                "url": "https://uni-muenster.sciebo.de/s/MnwAt06uUNUBijh",
+                "body": standard_first_message
+            }
+        )
 
 asyncio.get_event_loop().run_until_complete(main())
