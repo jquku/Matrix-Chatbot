@@ -1,4 +1,3 @@
-import re
 import os
 import yaml
 import sys
@@ -32,10 +31,7 @@ class Config(object):
             default: Any = None,
             required: bool = True,
     ) -> Any:
-        """Get a config option from a path and option name, specifying whether it is
-        required.
-        """
-        # Sift through the the config until we reach our option
+        #get fitting option
         config = self.config
         for name in path:
             config = config.get(name)

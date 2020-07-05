@@ -95,7 +95,7 @@ def change_number_of_stats_to_return(user, message):
     if "stats" in message or "stat" in message or "Stats" in message or "Stat" in message:
         if "=" in message:
             number_of_stats = re.findall(r'\d+', message)
-            if number_of_stats != None:
+            if number_of_stats != None and len(number_of_stats)>0:
                 number_of_stats = number_of_stats[0]
                 change_stats_preferred(user, number_of_stats)
                 return True

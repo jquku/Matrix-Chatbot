@@ -119,8 +119,8 @@ def data_basis_query(keywords):
     return links
 
 def data_basis_query_small_talk(keywords):
-    print("keyowrds:" + str(keywords))
-    print("calling the method")
+    #print("keyowrds:" + str(keywords))
+    #print("calling the method")
     if len(keywords) == 0:
         return []
     module_general_id = get_module_general_id()
@@ -132,7 +132,7 @@ def data_basis_query_small_talk(keywords):
         query = query + " OR module_id = " + str(module_general_id) + " AND topic LIKE '%" + keywords[i] + "%'"
     cursor.execute(query)
     links = cursor.fetchall()    #returns tuple
-    print("links: " + str(links))
+    #print("links: " + str(links))
     cursor.close()
     connection.close()
     return links
@@ -158,7 +158,7 @@ def get_module_general_id():
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM module WHERE name = 'general'")
     result = cursor.fetchall()
-    print("result:" + str(result))
+    #print("result:" + str(result))
     result = str(result[0][0])
     #result = str(result[0])
     cursor.close()
