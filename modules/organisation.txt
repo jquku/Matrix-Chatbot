@@ -1,5 +1,5 @@
 Modulname: Operating Systems (OS)
-Klausurtermin: Der Klausurtermin ist unbekannt.
+Klausurtermin: 07.08.2020, von 12 bis 14 Uhr
 Klausurdauer: 120 Minuten
 Klausurzulassung: Keine Vorleistungen sind erforderlich. Jeder wird zugelassen.
 Vorlesungstermine: Mir sind keine weiteren Präsentationen in den nächsten Tagen bekannt.
@@ -9,7 +9,7 @@ Lehrmaterialien: Alle Materialien befinden sich im Learnweb.
 Abgaben: Es gibt wöchtenliche Gruppenabgaben.
 Präsentationen: Die Präsentationen sind im Learnweb zu finden.
 Sonstiges zum Modul: Ich empfehle dieses Buch: https://gustavus.edu/mcs/max/os-book/
-Exam date: The exam date is unknown.
+Exam date: 07.08.2020, 12am-2pm
 Exam duration: 120 minutes
 Exam approval: Everybody gets the exam approval.
 Lecture dates: I don't know about any further presentations in the next days.
@@ -19,3 +19,4 @@ Teaching materials: All materials can be found in Learnweb.
 Duties: There are weekly group exercises.
 Presentations: The presentations can be found in learnweb.
 Other information about the module: I can recommend you reading this book: https://gustavus.edu/mcs/max/os-book/
+
