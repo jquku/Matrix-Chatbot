@@ -118,7 +118,8 @@ async def auto_join_room_cb(room, event):
     room_id = room.room_id
     room_display_name = room.display_name
     student_name = room.user_name(event.sender)
-
+    if student_name == None:
+        return
     salt_value = get_salt_value()
     if salt_value == None:
         salt_value = uuid.uuid4().hex
