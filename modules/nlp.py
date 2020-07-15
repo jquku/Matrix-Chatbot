@@ -16,9 +16,9 @@ from services.database_service import data_basis_query, get_number_of_links_to_b
 #1. Conversion to lowercase letters
 #2. Remove special characters
 #3. Tokenization
-#4. Lemmatization
-#5. Remove stop words
-#6. Remove spelling errors
+#4. Remove spelling errors
+#5. Lemmatization
+#6. Remove stop words
 
 def language_processing(message):
     lowercased = lowercase(message)
@@ -27,13 +27,13 @@ def language_processing(message):
     #print("REMOVE NOISES: " + str(remove_noises))
     tokens = tokenization(remove_noises)
     #print("TOKENS: " + str(tokens))
-    after_lemmitation = lemmatization(tokens)
-    #print("AFTER LEMMITATION: " + str(after_lemmitation))
-    without_stop_words = remove_stop_words(after_lemmitation)
-    #print("WITHOUT STOP WORDS: " + str(without_stop_words))
-    final_message = remove_spelling_errors(without_stop_words)
-    #print("FINAL MESSAGE: " + str(final_message))
-    return lowercased, final_message, tokens, after_lemmitation    #returns tuple
+    after_spell_checking = remove_spelling_errors(tokens)
+    #print("after spell checking: " + str(after_spell_checking))
+    after_lemmatization = lemmatization(after_spell_checking)
+    #print("AFTER LEMMATIZATION: " + str(after_lemmatization))
+    final_message = remove_stop_words(after_lemmatization)
+    #print("WITHOUT STOP WORDS FINAL MESSAGE: " + str(without_stop_words))
+    return lowercased, final_message, tokens, after_lemmatization    #returns tuple
 
 #lowercasing every letter in string
 def lowercase(text):
