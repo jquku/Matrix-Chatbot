@@ -28,8 +28,6 @@ config = Config(config_filepath)
 
 #AsyncClient configuration options
 client_config = AsyncClientConfig(
-    max_limit_exceeded=0,
-    max_timeouts=0,
     store_sync_tokens=True,
     encryption_enabled=True,
 )
