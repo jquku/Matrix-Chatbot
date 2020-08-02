@@ -1,17 +1,18 @@
 import sys
 sys.path.append("./../")
 
-from services.database_service import add_small_talk_document_to_data_basis, add_new_module, check_if_general_module_existing
+from services.database_service import add_small_talk_document_to_data_basis, add_new_domain, check_if_general_domain_existing
 from nlp import language_processing
 
 def add_small_talk_document():
     #add general module if not existing
-    module_id = check_if_general_module_existing()
+    module_id = check_if_general_domain_existing()
     if module_id == None:
-        module_id = add_new_module("general", "General", "")    #name, original, source
+        module_id = add_new_domain("general", "General", "")    #name, original, source
     else:
         module_id = module_id[0]
-    with open("general.txt", "r") as file:
+    document_name = "../knowledge_domains/small_talk.txt"
+    with open(document_name, "r") as file:
         for line in file:
             line = line.rstrip("\n")
             elements = line.split('-')

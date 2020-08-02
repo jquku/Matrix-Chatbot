@@ -40,7 +40,7 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 8. Add data basis by entering the folder modules and call the following scripts
    ```console
    python3 index_evaluation.py
-   python3 organisational_document.py
+   python3 organisation_evaluation.py
    python3 small_talk_evaluation.py
 9. Start the chatbot
    ```console

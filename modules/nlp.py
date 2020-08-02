@@ -8,9 +8,9 @@ from nltk.corpus import brown
 from autocorrect import Speller
 
 sys.path.append("./../")
-#nltk.download()
 
-from services.database_service import data_basis_query, get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links
+from services.database_service import (data_basis_query, get_number_of_links_to_be_shown,
+    set_number_of_links_to_be_shown, get_concerning_links, get_next_links)
 
 #Natural Language Processing Strategy
 #1. Conversion to lowercase letters
@@ -22,17 +22,11 @@ from services.database_service import data_basis_query, get_number_of_links_to_b
 
 def language_processing(message):
     lowercased = lowercase(message)
-    #print("LOWERCASED: " + str(lowercased))
     remove_noises = noise_removal(lowercased)
-    #print("REMOVE NOISES: " + str(remove_noises))
     tokens = tokenization(remove_noises)
-    #print("TOKENS: " + str(tokens))
     after_spell_checking = remove_spelling_errors(tokens)
-    #print("after spell checking: " + str(after_spell_checking))
     after_lemmatization = lemmatization(after_spell_checking)
-    #print("AFTER LEMMATIZATION: " + str(after_lemmatization))
     final_message = remove_stop_words(after_lemmatization)
-    #print("WITHOUT STOP WORDS FINAL MESSAGE: " + str(without_stop_words))
     return lowercased, final_message, tokens, after_lemmatization    #returns tuple
 
 #lowercasing every letter in string

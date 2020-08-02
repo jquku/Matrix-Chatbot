@@ -4,7 +4,7 @@ import sys
 
 sys.path.append("./../")
 
-from services.database_service import add_organisation_entry, get_module_id
+from services.database_service import add_organisation_entry, get_domain_description_id
 from nlp import language_processing
 
 def add_organisation_document():
@@ -12,9 +12,9 @@ def add_organisation_document():
     module = "Operating Systems (OS)"
     module = module.lower()
 
-    document_name = "organisation.txt"
+    document_name = "../knowledge_domains/organisation.txt"
 
-    module_id = get_module_id(module)
+    module_id = get_domain_description_id(module)
     if module_id != None:
         with open(document_name, "r") as file:
             for line in file:

@@ -3,9 +3,11 @@ import random
 
 sys.path.append("./../")
 
-from services.database_service import get_number_of_links_to_be_shown, set_number_of_links_to_be_shown, get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful, get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user
-from services.database_service import create_new_message, update_last_module_of_user, get_module_name, get_last_message, get_organisation_text
-from services.database_service import get_stats_preferred, get_student_language
+from services.database_service import (get_number_of_links_to_be_shown, set_number_of_links_to_be_shown,
+    get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful,
+    get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user,
+    create_new_message, update_last_module_of_user, get_domain_name, get_last_message, get_organisation_text,
+    get_stats_preferred, get_user_language)
 
 def generate_response(user, message, original_message):
 
@@ -27,7 +29,7 @@ def generate_response(user, message, original_message):
 
     response = ""
     number_of_links_found = len(links)
-    language_of_user = get_student_language(user)[0]
+    language_of_user = get_user_language(user)[0]
 
     #step 1: check if help called
     if help == True:
@@ -78,7 +80,6 @@ def generate_response(user, message, original_message):
                 response = response + str(output_stats[j][0]) + " was requested " + str(output_stats[j][1]) + " times. \n"
             else:
                 response = response + str(output_stats[j][0]) + " wurde " + str(output_stats[j][1]) + "-mal angefragt. \n"
-        #print("STATS STATS STATS: " + str(output_stats) + str(output_stats[0][0]) + str(type(output_stats)) + str(len(output_stats[0])))
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
@@ -89,7 +90,6 @@ def generate_response(user, message, original_message):
 
     if show_all == True:
         links_last_message_all = get_concerning_links(user)
-        #TUPLE
         response = response + links_last_message_all[0]
 
     #step 7: add links if necessary
@@ -106,19 +106,15 @@ def generate_response(user, message, original_message):
 
         how_many_links_to_show = get_number_of_links_to_be_shown(user)
         increment_links_counter_for_helpful(user)
-        #print("how many links to show: " + how_many_links_to_show)
         how_many_links_to_show = int(how_many_links_to_show)
         if language_of_user == "english":
             response = response + "I've found " + str(number_of_links_found) + " results. "
         else:
             response = response + "Ich habe " + str(number_of_links_found) + " Resultate gefunden. "
-        #print("RESPONSE: " + str(response))
         for i in range(0, number_of_links_found):
             if i == 0:
-                #print("LINKS[i]: " + str(links[i]))
-                #get module name of best fitting link
-                module = get_module_name(links[i])[0]
-                #print("MODULE NAME: " + str(module))
+                #get domain name of best fitting response
+                module = get_domain_name(links[i])[0]
                 update_last_module_of_user(user, module)
             if i < how_many_links_to_show:
                 response = response + links[i] +  "\n" +  "\n"
@@ -127,20 +123,18 @@ def generate_response(user, message, original_message):
 
         #step 8: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
-        #print("COUNTER TYPE: " + str(type(counter)) + str(counter[0]))
         if counter[0] % 5 == 0:    #every 5th link interaction added by "is my answer helpful"
             if language_of_user == "english":
                 response = response + "Is my answer helpful?"
             else:
                 response = response + "War meine Antwort hilfreich?"
 
-    #step 9: check if student answered with yes or no if answer was helpful
+    #step 9: check if user answered with yes or no if answer was helpful
     else:
         if message_contains_yes_or_no != False:
             counter = get_links_counter_for_helpful(user)
             if counter[0] % 5 == 0:
                 last_message = get_last_message(user)[0]
-                #print("LAST MESSAGE: " + str(last_message))
                 helpful_string_english = "Is my answer helpful?"
                 helpful_string_german = "War meine Antwort hilfreich?"
                 if helpful_string_english in last_message or helpful_string_german in last_message:
@@ -149,21 +143,15 @@ def generate_response(user, message, original_message):
                     else:
                         response = response + "Danke für dein Feedback!"
                     last_module = get_last_module_of_user(user)[0]
-                    #print("LAST MODULE: " + str(last_module))
-                    #print("SATISFACTION COUNTER: " + str(message_contains_yes_or_no))
                     update_modul_satisfaction(last_module, message_contains_yes_or_no)
                     create_new_message(user, original_message, lowercase_only, "", response)
                     return response
 
     #step 10: check if default answer is necessary
     if response == "":
-        #print("MESSAGE CONTAINS CONTAINS: " + str(message_contains_yes_or_no))
         if message_contains_yes_or_no != False:
             return response
-        #    helpful_string_english = "Is my answer helpful?"
-        #    helpful_string_german = "War meine Antwort hilfreich?"
-        #    if helpful_string_english in last_message or helpful_string_german in last_message:
-        #        return response
+    
         if language_of_user == "english":
             default_1 = "Can you please specify your question?"
             default_2 = "I haven't found anything fitting."
@@ -176,7 +164,6 @@ def generate_response(user, message, original_message):
             default_4 = "Das kann ich nicht beantworten."
         default_answer = [default_1, default_2, default_3, default_4]
         response = random.choice(default_answer)
-    #print("LINKS TYPE: " + str(type(links)))
 
     all_links_db = list_to_string(links)
     if all_links_db == "":

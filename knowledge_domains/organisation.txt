@@ -19,4 +19,3 @@ Teaching materials: All materials can be found in Learnweb.
 Duties: There are weekly group exercises.
 Presentations: The presentations can be found in learnweb.
 Other information about the module: I can recommend you reading this book: https://gustavus.edu/mcs/max/os-book/
-

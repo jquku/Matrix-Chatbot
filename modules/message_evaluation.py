@@ -8,10 +8,10 @@ from services.database_service import (data_basis_query,
     get_concerning_links, get_next_links,
     get_original_topic, check_if_topic_already_in_statistic,
     create_new_statistic_entry, increment_statistic_topic_counter, get_stats,
-    change_stats_preferred, links_from_multiple_modules, get_last_message,
-    get_all_modules, get_all_links_of_last_response,
-    check_if_link_belongs_to_module, change_student_language,
-    get_module_name_based_on_id, data_basis_query, data_basis_query_small_talk,
+    change_stats_preferred, links_from_multiple_domains, get_last_message,
+    get_all_domains, get_all_links_of_last_response,
+    check_if_link_belongs_to_module, change_user_language,
+    get_domain_name_based_on_id, data_basis_query, data_basis_query_small_talk,
     data_basis_query_organisational)
 
 def evaluate_message(user, message):
@@ -34,24 +34,12 @@ def evaluate_message(user, message):
     message_contains_thank_you = check_if_message_contains_thank_you(only_tokens)
     change_language = change_user_language(user, lowercase_only)
 
-    #print("HELP: " + str(help))
-    #print("CHANGE NUMBER OF LINKS: " + str(number_of_links))
-    #print("SHOW MORE: " + str(show_more))
-    #print("SHOW ALL: " + str(show_all))
-    #print("GREETINGS: " + str(greetings))
-    #print("GOODBYES: " + str(goodbyes))
-    #print("MESSAGE CONTAINS YES OR NO: " + str(message_contains_yes_or_no))
 
     links = data_basis_query(standardized_message)
-    #print("LINKS BEFORE BEFORE BEFORE: " + str(type(links)) + str(links) + str(len(links)))
     links = sort_links_by_matching(links, standardized_message)
-    #print("standardized message: " + str(standardized_message))
-    #print("after lemmitation: " + str(after_lemmitation))
     small_talk = data_basis_query_small_talk(after_lemmitation)
-    #print("small talk before: " + str(small_talk))
     small_talk = sort_links_by_matching_general(small_talk, after_lemmitation,
         65)
-    #print("small talk after: " + str(small_talk))
     if len(small_talk) > 0:
         small_talk = [small_talk[0]]
 
@@ -59,16 +47,16 @@ def evaluate_message(user, message):
     organisational = sort_links_by_matching_general(organisational,
         after_lemmitation, 75)
 
-    links_from_multiple_modules = check_if_links_from_multiple_modules(links)
-    answer_given_for_multiple_modules = check_if_answer_for_results_from_multiple_modules_given(user, only_tokens)
+    links_from_multiple_domains = check_if_links_from_multiple_domains(links)
+    answer_given_for_multiple_modules = check_if_answer_for_results_from_multiple_domains_given(user, only_tokens)
     if answer_given_for_multiple_modules != False:
         links = answer_given_for_multiple_modules
-        links_from_multiple_modules = False
+        links_from_multiple_domains = False
 
     evaluation = (lowercase_only, standardized_message, help, number_of_links,
         show_more, show_all, stats_called_result, message_contains_yes_or_no,
         message_contains_thank_you, changed_number_of_stats, change_language,
-        links_from_multiple_modules, links, small_talk, organisational)
+        links_from_multiple_domains, links, small_talk, organisational)
     return evaluation
 
 def help_called(message):
@@ -107,11 +95,11 @@ def change_user_language(user, message):
         if "=" in message:
 
             if "en" in message or "american" in message:
-                change_student_language(user, 'english')
+                change_user_language(user, 'english')
                 return True
 
             if "ger" in message or "de" in message:
-                change_student_language(user, 'german')
+                change_user_language(user, 'german')
                 return True
     return False
 
@@ -135,7 +123,7 @@ def stats_called(tokens):
     stats_called = False
     phrases = ["statistics", "stat", "stats", "analytics", "statistik",
         "analytik", "statistiken"]
-    modules = get_all_modules()
+    modules = get_all_domains()
     new_modules = []
     for j in range(0, len(modules)):
         new_modules.append(modules[j][0])
@@ -144,7 +132,6 @@ def stats_called(tokens):
     for i in range(0, len(tokens)):
         if tokens[i] in phrases:
             stats_called = True
-        #module_found = any(tokens[i] in string for string in modules)
         module_found = [string for string in modules if tokens[i] in string]
         if len(module_found) > 0:
             module = module_found[0]
@@ -195,49 +182,34 @@ def sort_links_by_matching(links, keywords):
 
         if matching > 0:
 
-            #print("current coefficient: " + str(matching))
             list_with_matching_coefficients.append(matching)
             new_links_list.append(links[m])
 
             if matching > 50:
-                #print("matching: " + str(matching))
                 query_result = get_original_topic(element)  #returns tuple
                 original = query_result[0]
                 module_id = query_result[1]
-                module = get_module_name_based_on_id(module_id)
-                #print("original: " + str(type(original)) + str(original))
-                #original = str(original[0])
+                module = get_domain_name_based_on_id(module_id)
                 module_in_statistic = check_if_topic_already_in_statistic(original)
-                #print("topic_in_statistic: " + str(module) + str(type(module)))
-                #topic_in_statistic = str(topic_in_statistic[0])
-                #print("topic_in_statistic: " + str(topic_in_statistic))
                 if module_in_statistic is None:
                     create_new_statistic_entry(module, original)
                 else:
                     increment_statistic_topic_counter(module, original)
 
-    #print("list with matching coefficients: " + str(list_with_matching_coefficients))
-    #print("new links list: " + str(new_links_list))
-    #sort list based on list with matching coefficients
-
     sorted_list = [x for _,x in sorted(zip(list_with_matching_coefficients,
         new_links_list))]
     sorted_list.reverse()
-    #print("sorted_list: " + str(sorted_list))
 
     #each list element contains topic + link
     all_links = []
     if len(sorted_list) > 0:
         for j in range(0, len(sorted_list)):
-            #print("current element: " + str(sorted_list[j][1]))
             all_links.append(sorted_list[j][1])   #only return link
-    #print("all links: " + str(all_links))
     all_links = list(dict.fromkeys(all_links)) #remove double topic with same link
     return all_links
 
 def sort_links_by_matching_general(links, keywords, value):
 
-    #print("keyowrds: " + str(keywords))
     links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
     only_topic = []
     for i in range(0, len(links)):
@@ -254,12 +226,9 @@ def sort_links_by_matching_general(links, keywords, value):
         current_list_a = " ".join(current).split()
         setA = set(keywords)
         setB = set(current_list_a)
-        #setA = set(current_list_a)
-        #setB = set(keywords)
         overlap = setA & setB
 
         matching = float(len(overlap)) / len(setB) * 100
-        #print("MATCHING: " + str(matching))
         if matching >= value:
 
             list_with_matching_coefficients.append(matching)
@@ -277,66 +246,54 @@ def sort_links_by_matching_general(links, keywords, value):
     all_links = list(dict.fromkeys(all_links)) #remove topics have same link; remove from list
     return all_links
 
-def check_if_links_from_multiple_modules(links):
+def check_if_links_from_multiple_domains(links):
     list_of_moduls_with_links = []
     for i in range(0, len(links)):
         current = links[i]
-        module = links_from_multiple_modules(current)
+        module = links_from_multiple_domains(current)
         if module not in list_of_moduls_with_links:
             list_of_moduls_with_links.append(module)
-    #print("LISTE: " + str(list_of_moduls_with_links))
     if len(list_of_moduls_with_links) == 1:
         return False#
     else:
-        all_modules_string = ""
+        all_domains_string = ""
         for j in range(0, len(list_of_moduls_with_links)):
-            current_module = list_of_moduls_with_links[j]
-            all_modules_string = all_modules_string + "- " + current_module + "\n"
-        #print("ALL MODULES STRING: " + str(all_modules_string))
-        return all_modules_string
+            current_domain = list_of_moduls_with_links[j]
+            all_domains_string = all_domains_string + "- " + current_domain + "\n"
+        return all_domains_string
 
-def check_if_answer_for_results_from_multiple_modules_given(user, tokens):
+def check_if_answer_for_results_from_multiple_domains_given(user, tokens):
     modules_to_show_links_of = []
     last_message = get_last_message(user)
     if last_message == None:
         return False
     last_message = last_message[0]
-    #print("LAST MESSAGES LAST MESSAGE LAST MESSAGES: \n" + str(last_message))
-    links_from_multiple_modules_string = "Which module are you interested in?"
-    if links_from_multiple_modules_string in last_message:
+    links_from_multiple_domains_string = "Which module are you interested in?"
+    if links_from_multiple_domains_string in last_message:
         last_message = last_message.lower()
         #check if current message contains module that was also in last message
-        all_modules = get_all_modules()
-        new_list_of_all_modules = []
-        for j in range(0, len(all_modules)):
-            new_list_of_all_modules.append(all_modules[j][0])
-        #print("ALL MODULES: " + str(new_list_of_all_modules) + str(type(new_list_of_all_modules)) + str(len(new_list_of_all_modules)))
-        for i in range(0, len(new_list_of_all_modules)):
-            current_module = new_list_of_all_modules[i]
-            #print("Tokens: " + str(tokens))
+        all_domains = get_all_domains()
+        new_list_of_all_domains = []
+        for j in range(0, len(all_domains)):
+            new_list_of_all_domains.append(all_domains[j][0])
+        for i in range(0, len(new_list_of_all_domains)):
+            current_domain = new_list_of_all_domains[i]
             for t in range(0, len(tokens)):
                 current_token = tokens[t]
-                if current_token in current_module:
-                    modules_to_show_links_of.append(current_module)
-            #if current_module in message:
-            #    modules_to_show_links_of.append(current_module)
+                if current_token in current_domain:
+                    modules_to_show_links_of.append(current_domain)
     if len(modules_to_show_links_of) == 0:
         return False
-    #print("modules to show links of: " + str(modules_to_show_links_of))
     #get links of last response
     all_links  = get_all_links_of_last_response(user)
     if all_links != None:
         all_links = all_links[0]
     all_links_string = all_links
     all_links = all_links.split()
-    #print("ALL LINKS: " + str(all_links))
     new_links = []
     for k in range(0, len(all_links)):
         current_link = all_links[k]
-        #print("CURRENT LINK: " + str(current_link))
         module = check_if_link_belongs_to_module(current_link)[0]
-        #print("Belonging module: " + str(module))
         if module in modules_to_show_links_of:
             new_links.append(current_link)
-    #print("NEW LINKS: " + str(new_links))
     return new_links
