@@ -41,7 +41,7 @@ client = AsyncClient(
 async def main():
     #client login
     await client.login(password=config.user_password)
-    print("after login")
+    print("login successful")
 
     #add event callbacks
     client.add_event_callback(message_cb, RoomMessageText)
@@ -79,7 +79,7 @@ async def message_cb(room, event):
     else:
 
         #hasing of the user name with salt
-        salt_value = get_salt_value(user_name)
+        salt_value = get_salt_value()
         salt_value = salt_value[0]
         salt_value = salt_value.encode('utf-8')
         user_name = user_name.encode('utf-8')
@@ -116,10 +116,10 @@ async def auto_join_room_cb(room, event):
     user_name = room.user_name(event.sender)
     if user_name == None:
         return
-    salt_value = get_salt_value(user_name)
+    salt_value = get_salt_value()
     if salt_value == None:
         salt_value = uuid.uuid4().hex
-        add_salt_value(user_name, salt_value)
+        add_salt_value(salt_value)
     salt_value = salt_value[0]
     salt_value = salt_value.encode('utf-8')
     user_name = user_name.encode('utf-8')

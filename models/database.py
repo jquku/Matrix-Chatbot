@@ -17,7 +17,7 @@ def create_tables():
     cursor.execute("CREATE TABLE IF NOT EXISTS statistics (id SERIAL PRIMARY KEY, domain_description_id integer, topic VARCHAR(255), questioned integer, FOREIGN KEY (domain_description_id) REFERENCES domain_description(id) )")
     cursor.execute("CREATE TABLE IF NOT EXISTS message (id SERIAL PRIMARY KEY, user_client_id integer, body text, information_extracted text, all_links text, response text, FOREIGN KEY (user_client_id) REFERENCES user_client(id))")
     cursor.execute("CREATE TABLE IF NOT EXISTS data_basis (id SERIAL PRIMARY KEY, domain_description_id integer, original text, topic VARCHAR(255), response VARCHAR(255), FOREIGN KEY (domain_description_id) REFERENCES domain_description(id))")
-    cursor.execute("CREATE TABLE IF NOT EXISTS salt (id SERIAL PRIMARY KEY, user_client_id integer, value text, FOREIGN KEY (user_client_id) REFERENCES user_client(id))")
+    cursor.execute("CREATE TABLE IF NOT EXISTS salt (id SERIAL PRIMARY KEY, value text)")
     cursor.execute("CREATE TABLE IF NOT EXISTS room (id SERIAL PRIMARY KEY, room_id text, user_client_id integer, FOREIGN KEY (user_client_id) REFERENCES user_client(id) )")
     connection.commit() #commit changes
     cursor.close()

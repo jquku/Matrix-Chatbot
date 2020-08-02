@@ -43,7 +43,6 @@ def get_user_client_id(user_name):
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM user_client WHERE name = %s", [user_name])
     query_result = cursor.fetchone()
-    print("query result: " + str(query_result))
     if query_result != None:
         query_result = query_result[0]
     return query_result
@@ -251,7 +250,7 @@ def create_new_statistic_entry(module, topic):
     connection.close()
 
 def increment_statistic_topic_counter(module, topic):
-    domain_description_id_id = get_domain_description_id_id(module)
+    domain_description_id = get_domain_description_id(module)
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("UPDATE statistics SET questioned = questioned + 1 WHERE domain_description_id = %s and topic = %s", [domain_description_id, topic])
@@ -259,11 +258,11 @@ def increment_statistic_topic_counter(module, topic):
     cursor.close()
     connection.close()
 
-def get_domain_description_id_id_for_stats(module):
+def get_domain_description_id_for_stats(module):
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT id FROM domain_description WHERE name LIKE '%" + module + "%'")
-    modudomain_idle_id = cursor.fetchone()
+    domain_id = cursor.fetchone()
     domain_id = domain_id[0]
     cursor.close()
     connection.close()
@@ -271,7 +270,7 @@ def get_domain_description_id_id_for_stats(module):
 
 
 def get_stats(module):
-    domain_description_id = get_domain_description_id_id_for_stats(module)
+    domain_description_id = get_domain_description_id_for_stats(module)
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT topic, questioned FROM statistics WHERE domain_description_id = %s order by questioned desc", [domain_description_id])
@@ -317,7 +316,7 @@ def update_modul_satisfaction(module, factor):
     connection.close()
 
 def update_last_module_of_user(user, last_module):
-    last_module = get_domain_description_id_id(last_module)
+    last_module = get_domain_description_id(last_module)
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("UPDATE user_client SET last_module = %s WHERE name = %s", [last_module, user])
@@ -362,7 +361,7 @@ def add_organisation_entry(module, original, topic, response):
     connection.close()
 
 def get_organisation_text(module):
-    domain_description_id = get_domain_description_id_id(module)
+    domain_description_id = get_domain_description_id(module)
     connection = connect_to_database()
     cursor = connection.cursor()
     cursor.execute("SELECT original FROM data_basis WHERE domain_description_id = %s and topic = 'Organisation'", [domain_description_id])
@@ -455,20 +454,18 @@ def check_if_link_belongs_to_module(response):
     connection.close()
     return module
 
-def add_salt_value(user_name, value):
+def add_salt_value(value):
     connection = connect_to_database()
     cursor = connection.cursor()
-    user_client_id = get_user_client_id(user_name)
-    cursor.execute("INSERT INTO salt(user_client_id, value) VALUES (%s, %s)", [user_client_id, value])
+    cursor.execute("INSERT INTO salt(value) VALUES (%s)", [value])
     connection.commit()
     cursor.close()
     connection.close()
 
-def get_salt_value(user_name):
+def get_salt_value():
     connection = connect_to_database()
     cursor = connection.cursor()
-    user_client_id = get_user_client_id(user_name)
-    cursor.execute("SELECT value FROM salt WHERE user_client_id = %s", [user_client_id])
+    cursor.execute("SELECT value FROM salt")
     value = cursor.fetchone()
     cursor.close()
     connection.close()

@@ -29,7 +29,6 @@ def add_second_index():
     module = module.lower()
 
     module_in_db = check_if_domain_already_in_data_basis(module)
-    print(str(module_in_db))
 
     if module_in_db == None:
 
@@ -50,14 +49,14 @@ def add_second_index():
                 topic = ul.find_previous('li').text
                 topic_original = topic.partition('\n')[0]
                 topic = language_processing(topic_original)[1]
-                topic = list_to_string(topic)              
+                topic = list_to_string(topic)
                 url = ul.find('a').get('href')    #first link is taken
 
             else:
 
                 topic_original = link.find('a').text
                 topic = language_processing(topic_original)[1]   #get final message of nlp module
-                topic = list_to_string(topic) 
+                topic = list_to_string(topic)
                 url = link.find('a').get('href')
 
             add_data_basis_entry(module_id, topic_original, topic, url)
@@ -67,7 +66,6 @@ def add_data_basis():
     module = "Operating Systems (OS)"
     module_original = module
     module = module.lower()
-    print("module lower: " + str(module))
     module_in_db = check_if_domain_already_in_data_basis(module)
 
     if module_in_db == None:
@@ -111,4 +109,4 @@ def delete_existing_data_basis(module):
 
 if __name__ == '__main__':
     add_data_basis()
-    #add_second_index()     #remove the # if you want to 
+    #add_second_index()     #remove the # if you want to

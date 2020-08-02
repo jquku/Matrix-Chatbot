@@ -1,6 +1,6 @@
 matrix:
-  user_id: "@neo-wwu:matrix.org"
-  user_password: "johaiva123thaype"
+  user_id: "@testbot123:matrix.org"
+  user_password: "testbot123"
   homeserver_url: "https://matrix.org"
 
 database:
