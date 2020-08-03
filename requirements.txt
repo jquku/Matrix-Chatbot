@@ -1,3 +1,4 @@
+matrix-nio
 psycopg2-binary
 requests
 nltk
