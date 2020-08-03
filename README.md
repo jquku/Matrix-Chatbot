@@ -23,7 +23,7 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 ## Configuration
 - Create a new Element user account manually  [main.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/main.py) appropiately.
 - Customize the connection parameters of the database and Element account in [config.yaml](https://github.com/jquku/Matrix-Chatbot/blob/master/config.yaml)
-- To add chatbot knowledge of a new lecture script, change the URL and if necessary the URL prefix in [index_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/index_evaluation.py)
+- To add chatbot knowledge of a new lecture script, change the URL, if necessary the URL prefix and add the module name all in [index_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/index_evaluation.py)
 - To expand the chatbot's data basis, add new rules to [small_talk_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/small_talk_evaluation.py) and [organisational_document.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/organisational_document.py).
 
 ## Setup
@@ -48,12 +48,12 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 7. Start the chatbot
    ```console
    python3 main.py
-   
+
  ### E2EE support
- The support is still a work in progress for the project. Messages sent to an encrypted room 
+ The support is still a work in progress for the project. Messages sent to an encrypted room
  cannot be handlet yet. For future development, this is how matrix-nio with E2EE support can
  be downloaded.
- 
+
  1. Install the latest version of python-olm
    For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
    ```console
@@ -63,11 +63,11 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
    sudo ldcfongig
 2. Install [matrix-nio](https://github.com/poljar/matrix-nio), if you want e2e support call
    ```console
-   pip3 install "matrix-nio[e2e]" 
-  
-## Architecture  
-   
-## License
-MIT licensed
+   pip3 install "matrix-nio[e2e]"
 
-Copyright (C) 2020 Jonathan Quade
+ ## Architecture  
+
+ ## License
+ MIT licensed
+
+ Copyright (C) 2020 Jonathan Quade
