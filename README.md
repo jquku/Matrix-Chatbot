@@ -45,3 +45,8 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 9. Start the chatbot
    ```console
    python3 main.py
+   
+## License
+MIT licensed
+
+Copyright (C) 2020 Jonathan Quade
