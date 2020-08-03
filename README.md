@@ -55,17 +55,32 @@ cannot be handlet yet. For future development, this is how matrix-nio with E2EE 
 be downloaded.
 
 1. Install the latest version of python-olm
-  For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
-  ```console
-  git clone https://gitlab.matrix.org/matrix-org/olm.git
-  sudo make
-  sudo make install
-  sudo ldcfongig
+   For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
+   ```console
+   git clone https://gitlab.matrix.org/matrix-org/olm.git
+   sudo make
+   sudo make install
+   sudo ldcfongig
 2. Install [matrix-nio](https://github.com/poljar/matrix-nio), if you want e2e support call
    ```console
    pip3 install "matrix-nio[e2e]"
 
 ## Architecture  
+The software architecture is modular and consists of seven modules. 
+![Modular software architecture](architecture.png)
+
+### Database scheme
+Chabot data is being anonymized and stored in 7 tables in a relational PostgreSQL database. The database 
+is accessible via docker container.
+![Database scheme](scheme.png)
+
+### Sequence diagram
+This sequence diagram describes how an incoming text message is processed by the chatbot. 
+![Sequence Diagram](sequence.png)
+
+### NLP strategy
+Test message are processed with an nlp component. 
+![NLP strategy](nlp.png)
 
 ## License
 MIT licensed
