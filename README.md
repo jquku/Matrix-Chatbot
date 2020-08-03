@@ -66,20 +66,22 @@ be downloaded.
    pip3 install "matrix-nio[e2e]"
 
 ## Architecture  
-The software architecture is modular and consists of seven modules. 
+The software architecture is modular and consists of seven modules.
 ![Modular software architecture](architecture.png)
 
 ### Database scheme
-Chabot data is being anonymized and stored in 7 tables in a relational PostgreSQL database. The database 
+Chabot data is being anonymized and stored in 7 tables in a relational PostgreSQL database. The database
 is accessible via docker container.
-![Database scheme](scheme.png)
+![Database scheme](schema.png)
 
 ### Sequence diagram
-This sequence diagram describes how an incoming text message is processed by the chatbot. 
+This sequence diagram describes how an incoming text message is processed by the chatbot to generate
+a response fitting the user's message.
 ![Sequence Diagram](sequence.png)
 
 ### NLP strategy
-Test message are processed with an nlp component. 
+Test messages are processed with an nlp component. The processing is necessary to standardize the messages
+which allows the chatbot to later find fitting entries (rules) from the data basis.
 ![NLP strategy](nlp.png)
 
 ## License
