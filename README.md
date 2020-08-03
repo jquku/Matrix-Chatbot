@@ -49,25 +49,25 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
    ```console
    python3 main.py
 
- ### E2EE support
- The support is still a work in progress for the project. Messages sent to an encrypted room
- cannot be handlet yet. For future development, this is how matrix-nio with E2EE support can
- be downloaded.
+### E2EE support
+The support is still a work in progress for the project. Messages sent to an encrypted room
+cannot be handlet yet. For future development, this is how matrix-nio with E2EE support can
+be downloaded.
 
- 1. Install the latest version of python-olm
-   For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
-   ```console
-   git clone https://gitlab.matrix.org/matrix-org/olm.git
-   sudo make
-   sudo make install
-   sudo ldcfongig
+1. Install the latest version of python-olm
+  For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
+  ```console
+  git clone https://gitlab.matrix.org/matrix-org/olm.git
+  sudo make
+  sudo make install
+  sudo ldcfongig
 2. Install [matrix-nio](https://github.com/poljar/matrix-nio), if you want e2e support call
    ```console
    pip3 install "matrix-nio[e2e]"
 
- ## Architecture  
+## Architecture  
 
- ## License
- MIT licensed
+## License
+MIT licensed
 
- Copyright (C) 2020 Jonathan Quade
+Copyright (C) 2020 Jonathan Quade
