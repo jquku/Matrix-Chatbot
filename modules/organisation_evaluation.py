@@ -1,5 +1,3 @@
-from bs4 import BeautifulSoup   #scraping by using the BeautifulSoup package
-
 import sys
 
 sys.path.append("./../")
@@ -7,12 +5,17 @@ sys.path.append("./../")
 from services.database_service import add_organisation_entry, get_domain_description_id
 from nlp import language_processing
 
-def add_organisation_document():
+'''
+analyze simple text documents and store rules into data basis of db
+text document consists of topic + response
+'''
 
+def add_organisation_document():
+    '''adds an organisation document, adjust filepath accordingly'''
     module = "Operating Systems (OS)"
     module = module.lower()
 
-    document_name = "../knowledge_domains/organisation.txt"
+    document_name = "../knowledge_domains/organisation.txt"  #filepath
 
     module_id = get_domain_description_id(module)
     if module_id != None:
@@ -26,6 +29,7 @@ def add_organisation_document():
                 evaluate_topic(module, topic, response)
 
 def evaluate_topic(module, topic, response):
+    '''adds additional rules for data basis'''
     original = "Organisational"
     formulations = []
     if topic == 'Modulname':
@@ -78,6 +82,7 @@ def evaluate_topic(module, topic, response):
         add_organisation_entry(module, original, after_lemmitation, response)
 
 def list_to_string(message):
+    '''method that transforms a list into a string'''
     final = ""
     for i in range(0, len(message)):
         final = final + message[i] +  " "

@@ -15,11 +15,9 @@ from services.database_service import (check_if_room_is_existing,
     add_salt_value, check_if_room_is_existing, get_all_domains_original,
     get_room_ids)
 from nlp import language_processing
-from response_management import generate_response
 from message_evaluation import evaluate_message
+from response_management import generate_response
 from config import Config
-
-#from aiofiles import *
 
 #set filepath of config file
 config_filepath = "../config.yaml"
@@ -38,7 +36,16 @@ client = AsyncClient(
     config=client_config,
 )
 
+'''
+The main module controls the processing of events via callback functions
+1) InviteEvents --> auto-join room
+2) MessageEvents --> pass message to other modules
+
+The module also sends messages to the matrix homeserver
+'''
+
 async def main():
+
     #client login
     await client.login(password=config.user_password)
     print("login successful")
@@ -47,7 +54,7 @@ async def main():
     client.add_event_callback(message_cb, RoomMessageText)
     client.add_event_callback(auto_join_room_cb, InviteEvent)
 
-    #sync encryption keys with the server, for encrypted rooms
+    #sync encryption keys (encrypted rooms currently not working))
     if client.should_upload_keys:
         await client.keys_upload()
 
@@ -57,6 +64,7 @@ async def main():
     await client.close()
 
 async def sendMessage(room_id, response):
+    '''send messages to room via room id'''
 
     await client.room_send(
         room_id=room_id,
@@ -68,6 +76,7 @@ async def sendMessage(room_id, response):
     )
 
 async def message_cb(room, event):
+    '''called whenever a new message event has been detected'''
 
     room_id = str(room.room_id)
     user_name = room.user_name(event.sender)
@@ -92,14 +101,14 @@ async def message_cb(room, event):
         current_timestamp = int(round(time.time() * 1000))
         timestamp_difference = current_timestamp - event_timestamp
 
-        #print("timestamp difference: " + str(timestamp_difference))
-        #ignore old events
-        if timestamp_difference < 20000:
+        if timestamp_difference < 20000:   #ignore old messages
+
             print("New message event: " + str(message_body))
             if check_if_user_is_existing(user_name) == False:
-                create_new_user(user_name, "operating systems (os)")   #default: show 2 links
+                #create new user entry in db
+                create_new_user(user_name, "operating systems (os)")
 
-            #process message
+            #pass message to other modules
             processed_message = language_processing(message_body)
             evaluation = evaluate_message(user_name, processed_message)
             response = generate_response(user_name, evaluation, message_body)
@@ -111,6 +120,7 @@ async def message_cb(room, event):
 
 #auto join rooms
 async def auto_join_room_cb(room, event):
+    '''called when the chatbot received a new room invite'''
 
     room_id = room.room_id
     user_name = room.user_name(event.sender)
@@ -126,8 +136,9 @@ async def auto_join_room_cb(room, event):
     hashed_user_name = hashlib.sha512(user_name + salt_value).hexdigest()
     user_name = hashed_user_name
 
+    #create new user, room entry in db if not already existing
     if check_if_user_is_existing(user_name) == False:
-        create_new_user(hashed_user_name, "operating systems (os)")   #default: show 2 links
+        create_new_user(hashed_user_name, "operating systems (os)")
 
     if check_if_room_is_existing(room_id) == False:
         create_new_room(room_id, hashed_user_name)

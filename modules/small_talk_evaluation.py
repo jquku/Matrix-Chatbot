@@ -1,17 +1,23 @@
 import sys
 sys.path.append("./../")
 
-from services.database_service import add_small_talk_document_to_data_basis, add_new_domain, check_if_general_domain_existing
+from services.database_service import (add_small_talk_document_to_data_basis,
+    add_new_domain, check_if_general_domain_existing)
 from nlp import language_processing
 
+'''
+add small talk document to data basis
+document consists of topic + response entries
+'''
+
 def add_small_talk_document():
-    #add general module if not existing
+    '''adds small talk document into data basis, adjust filepath accordingly'''
     module_id = check_if_general_domain_existing()
     if module_id == None:
         module_id = add_new_domain("general", "General", "")    #name, original, source
     else:
         module_id = module_id[0]
-    document_name = "../knowledge_domains/small_talk.txt"
+    document_name = "../knowledge_domains/small_talk.txt"   #filepath
     with open(document_name, "r") as file:
         for line in file:
             line = line.rstrip("\n")
@@ -25,6 +31,7 @@ def add_small_talk_document():
             add_small_talk_document_to_data_basis(module_id, topic, after_lemmitation, response) #original, topic, link
 
 def list_to_string(message):
+    '''delete existing data basis based on domain/module name'''
     final = ""
     for i in range(0, len(message)):
         final = final + message[i] +  " "

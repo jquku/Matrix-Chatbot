@@ -3,14 +3,21 @@ import random
 
 sys.path.append("./../")
 
-from services.database_service import (get_number_of_links_to_be_shown, set_number_of_links_to_be_shown,
-    get_concerning_links, get_next_links, get_stats, increment_links_counter_for_helpful,
-    get_links_counter_for_helpful, update_modul_satisfaction, get_last_module_of_user,
-    create_new_message, update_last_module_of_user, get_domain_name, get_last_message, get_organisation_text,
+from services.database_service import (get_number_of_links_to_be_shown,
+    set_number_of_links_to_be_shown, get_concerning_links, get_next_links,
+    get_stats, increment_links_counter_for_helpful,
+    get_links_counter_for_helpful, update_modul_satisfaction,
+    get_last_module_of_user, create_new_message, update_last_module_of_user,
+    get_domain_name, get_last_message, get_organisation_text,
     get_stats_preferred, get_user_language)
 
-def generate_response(user, message, original_message):
+'''
+this module receives the message evaluation and builds an
+appropiate chatbot response
+'''
 
+def generate_response(user, message, original_message):
+    '''method that generates the final chatbot response based on evaluation'''
     lowercase_only = message[0]
     standardized_message = message[1]
     help = message[2]
@@ -37,7 +44,6 @@ def generate_response(user, message, original_message):
             response = "Use 'links = X' to return X links by default. \n" + "Use 'show more' to display more links fitting the query. \n" + "Use 'show all' to display all links fitting the query. \n" + "Use 'stats' and add your module to receive the statistics. \n" + "Use 'stats = X' to return X stats by default. \n" + "Use 'language = english/german' to change my bot language."
         else:
             response = "Schreibe 'links = X' um standardmäßig X links zurückzugeben. \n" + "Mit 'zeig mehr' bekommst du mehr Links angezeigt. \n" + "Mit 'zeig alles' werden alle passenden Links zurückgegeben. \n" + "Tippe 'stats' und füge deinen Modulnamen hinzu, um die Statistiken abzurufen. \n" + "Mit 'stats = X' werden dir X Statistiken angezeigt.. \n" + "Mit 'language = englisch/deutsch' kannst du die Bot Sprache abändern."
-        #create_new_message params = user, original message; information_extracted, all_links, response
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
@@ -51,7 +57,7 @@ def generate_response(user, message, original_message):
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
-    #step 3: small talk
+    #step 3: small talk and organisational domains
     if len(small_talk) > 0:
         response = response + small_talk[0] + " "
 
@@ -67,7 +73,7 @@ def generate_response(user, message, original_message):
 
     #step 5: return statistics if called
     if stats_called != False:
-        output_stats = get_stats(stats_called)  #returns sorted list of topics + questions
+        output_stats = get_stats(stats_called)  #returns sorted list of topics + question couter
         if language_of_user == "english":
             response = response + "Here are the most requested topics. \n \n"
         else:
@@ -83,7 +89,7 @@ def generate_response(user, message, original_message):
         create_new_message(user, original_message, lowercase_only, "", response)
         return response
 
-    #step 6: check if show more or show all is called
+    #step 6: check if show more or show all called
     if show_more == True:
         links_last_message_more = get_next_links(user)
         response = response + links_last_message_more
@@ -92,7 +98,7 @@ def generate_response(user, message, original_message):
         links_last_message_all = get_concerning_links(user)
         response = response + links_last_message_all[0]
 
-    #step 7: add links if necessary
+    #step 7: add fitting links (response from domain) if necessary
     if number_of_links_found > 0:
 
         if links_from_multiple_modules != False:
@@ -123,13 +129,13 @@ def generate_response(user, message, original_message):
 
         #step 8: add "is my answer helpful" after every 5th link interaction
         counter = get_links_counter_for_helpful(user)
-        if counter[0] % 5 == 0:    #every 5th link interaction added by "is my answer helpful"
+        if counter[0] % 5 == 0:
             if language_of_user == "english":
                 response = response + "Is my answer helpful?"
             else:
                 response = response + "War meine Antwort hilfreich?"
 
-    #step 9: check if user answered with yes or no if answer was helpful
+    #step 9: check if user answered with "yes" or "no" after "if answer was helpful"
     else:
         if message_contains_yes_or_no != False:
             counter = get_links_counter_for_helpful(user)
@@ -151,7 +157,8 @@ def generate_response(user, message, original_message):
     if response == "":
         if message_contains_yes_or_no != False:
             return response
-    
+
+        #random chosing of default message
         if language_of_user == "english":
             default_1 = "Can you please specify your question?"
             default_2 = "I haven't found anything fitting."
@@ -175,6 +182,7 @@ def generate_response(user, message, original_message):
     return response
 
 def list_to_string(links):
+    '''method that transforms a list into a string'''
     final = ""
     for i in range(0, len(links)):
         final = final + links[i] +  "\n" +  "\n"

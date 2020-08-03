@@ -5,10 +5,11 @@ sys.path.append("./../")
 
 from services.database_service import connect_to_database
 
-def create_tables():
+'''creating all the database tables based on sql commands'''
 
-    #initialize db connection
-    connection = connect_to_database()
+def create_tables():
+    '''creates all the database tables'''
+    connection = connect_to_database()      #initialize db connection
 
     #create tables via sql commands
     cursor = connection.cursor()

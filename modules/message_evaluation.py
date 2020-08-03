@@ -14,8 +14,13 @@ from services.database_service import (data_basis_query,
     get_domain_name_based_on_id, data_basis_query, data_basis_query_small_talk,
     data_basis_query_organisational)
 
-def evaluate_message(user, message):
+'''
+complete evaluation of the message, also checks if there is an entry
+from the knowledge domain in the db fitting the user query
+'''
 
+def evaluate_message(user, message):
+    '''controls the evaluation'''
     lowercase_only = message[0]
     standardized_message = message[1]
     only_tokens = message[2]
@@ -53,6 +58,7 @@ def evaluate_message(user, message):
         links = answer_given_for_multiple_modules
         links_from_multiple_domains = False
 
+    #collect evaluation results and store them into one
     evaluation = (lowercase_only, standardized_message, help, number_of_links,
         show_more, show_all, stats_called_result, message_contains_yes_or_no,
         message_contains_thank_you, changed_number_of_stats, change_language,
@@ -60,7 +66,7 @@ def evaluate_message(user, message):
     return evaluation
 
 def help_called(message):
-
+    '''checks if user has called help/options'''
     help_phrases = ['help', 'i need help', 'help me', 'hilf mir', 'hilfe',
         'options', 'optionen']
     for i in range(0, len(help_phrases)):
@@ -70,6 +76,7 @@ def help_called(message):
     return False
 
 def change_standard_number_of_links_called(user, message):
+    '''checks if user wants to change the output's number of links'''
     if "links" in message or "link" in message or "Links" in message or "Link" in message:
         if "=" in message:
             number = re.findall(r'\d+', message)
@@ -80,6 +87,7 @@ def change_standard_number_of_links_called(user, message):
     return False
 
 def change_number_of_stats_to_return(user, message):
+    '''checks if user wants to increase or reduce the stats scope'''
     if "stats" in message or "stat" in message or "Stats" in message or "Stat" in message:
         if "=" in message:
             number_of_stats = re.findall(r'\d+', message)
@@ -90,6 +98,7 @@ def change_number_of_stats_to_return(user, message):
     return False
 
 def change_user_language(user, message):
+    '''checks if a language change was requested'''
     if "language" in message or "Language" in message or "sprache" in message or "Sprache" in message:
 
         if "=" in message:
@@ -104,7 +113,7 @@ def change_user_language(user, message):
     return False
 
 def show_more_called(message):
-
+    '''checks if keywords show more called'''
     if "show" in message or "zeig" in message:
         if "more" in message or "mehr" in message:
             return True
@@ -112,7 +121,7 @@ def show_more_called(message):
         return False
 
 def show_all_called(message):
-
+    '''checks if keywords show all called?'''
     if "show" in message or "zeig" in message:
         if "all" in message or "alles" in message:
             return True
@@ -120,6 +129,7 @@ def show_all_called(message):
         return False
 
 def stats_called(tokens):
+    '''checks if user wants to receive stats'''
     stats_called = False
     phrases = ["statistics", "stat", "stats", "analytics", "statistik",
         "analytik", "statistiken"]
@@ -141,6 +151,7 @@ def stats_called(tokens):
         return False
 
 def check_if_message_contains_yes_or_no(tokens):
+    '''checks if the user's message contains a yes or no'''
     phrases_yes = ["yes", "yeah", "jo", "ja", "klar", "for sure"]
     phrases_no = ["no", "not at all", "nah", "ne", "nein"]
     for i in range(0, len(tokens)):
@@ -151,6 +162,7 @@ def check_if_message_contains_yes_or_no(tokens):
     return False
 
 def check_if_message_contains_thank_you(tokens):
+    '''checks if the user's message contains a thank you'''
     phrases = ['thank you', 'thanks', 'danke', 'dankeschön', 'vielen dank',
         'lieben dank', 'thank you very much', 'thx', 'merci']
     for i in range(0, len(tokens)):
@@ -159,7 +171,7 @@ def check_if_message_contains_thank_you(tokens):
     return False
 
 def sort_links_by_matching(links, keywords):
-
+    '''sort fitting responses based on matching coefficient'''
     links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
     only_topic = []
     for i in range(0, len(links)):
@@ -178,15 +190,15 @@ def sort_links_by_matching(links, keywords):
         setB = set(keywords)
         overlap = setA & setB
 
-        matching = float(len(overlap)) / len(setB) * 100
+        matching = float(len(overlap)) / len(setB) * 100    #calculate matching
 
         if matching > 0:
 
             list_with_matching_coefficients.append(matching)
             new_links_list.append(links[m])
 
-            if matching > 50:
-                query_result = get_original_topic(element)  #returns tuple
+            if matching > 50: #increase stats counter for fitting links
+                query_result = get_original_topic(element)
                 original = query_result[0]
                 module_id = query_result[1]
                 module = get_domain_name_based_on_id(module_id)
@@ -200,16 +212,16 @@ def sort_links_by_matching(links, keywords):
         new_links_list))]
     sorted_list.reverse()
 
-    #each list element contains topic + link
+    #each list element contains topic + response
     all_links = []
     if len(sorted_list) > 0:
         for j in range(0, len(sorted_list)):
             all_links.append(sorted_list[j][1])   #only return link
-    all_links = list(dict.fromkeys(all_links)) #remove double topic with same link
+    all_links = list(dict.fromkeys(all_links)) #remove doubles
     return all_links
 
 def sort_links_by_matching_general(links, keywords, value):
-
+    '''sort fitting responses from small talk based on matching coefficient'''
     links = list(dict.fromkeys(links)) #remove doubles by transforming into dict
     only_topic = []
     for i in range(0, len(links)):
@@ -238,15 +250,16 @@ def sort_links_by_matching_general(links, keywords, value):
         new_links_list))]
     sorted_list.reverse()
 
-    #each list element contains topic + link
+    #each list element contains topic + response
     all_links = []
     if len(sorted_list) > 0:
         for j in range(0, len(sorted_list)):
-            all_links.append(sorted_list[j][1])   #only return link, not whole tuple
-    all_links = list(dict.fromkeys(all_links)) #remove topics have same link; remove from list
+            all_links.append(sorted_list[j][1])
+    all_links = list(dict.fromkeys(all_links)) #remove topics with same response
     return all_links
 
 def check_if_links_from_multiple_domains(links):
+    '''fitting responses can also come from multiple knowledge domains'''
     list_of_moduls_with_links = []
     for i in range(0, len(links)):
         current = links[i]
@@ -263,6 +276,7 @@ def check_if_links_from_multiple_domains(links):
         return all_domains_string
 
 def check_if_answer_for_results_from_multiple_domains_given(user, tokens):
+    '''in case multiple fitting responses from different domains found'''
     modules_to_show_links_of = []
     last_message = get_last_message(user)
     if last_message == None:
@@ -284,7 +298,6 @@ def check_if_answer_for_results_from_multiple_domains_given(user, tokens):
                     modules_to_show_links_of.append(current_domain)
     if len(modules_to_show_links_of) == 0:
         return False
-    #get links of last response
     all_links  = get_all_links_of_last_response(user)
     if all_links != None:
         all_links = all_links[0]
