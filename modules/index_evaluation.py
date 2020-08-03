@@ -24,44 +24,9 @@ def list_to_string(topic):
         output = output + str(topic[i]) + " "
     return output
 
-def add_second_index():
-    '''add another html index for testing, set filepath accordingly'''
-    module = "Chatbots"
-    module_original = module
-    module = module.lower()
-
-    module_in_db = check_if_domain_already_in_data_basis(module)
-
-    if module_in_db == None:
-
-        soup = BeautifulSoup(open("test_index.html"), "html.parser")  #path of index
-        links = soup.findAll('li')
-        numberOfLinks = len(links)
-        module_id = add_new_domain(module, module_original, url)
-        for link in links:
-
-            ul = link.find('ul')
-
-            if ul != None:    #this is a topic within the index without a link, get fist upcoming link then
-
-                topic = ul.find_previous('li').text
-                topic_original = topic.partition('\n')[0]
-                topic = language_processing(topic_original)[1]
-                topic = list_to_string(topic)
-                url = ul.find('a').get('href')    #first link is taken
-
-            else:
-
-                topic_original = link.find('a').text
-                topic = language_processing(topic_original)[1]   #get final message of nlp module
-                topic = list_to_string(topic)
-                url = link.find('a').get('href')
-
-            add_data_basis_entry(module_id, topic_original, topic, url)
-
 def add_data_basis():
     '''analyze web index and store into db'''
-    module = "Operating Systems (OS)"
+    module = "<module name>"
     module_original = module
     module = module.lower()
     module_in_db = check_if_domain_already_in_data_basis(module)
@@ -108,4 +73,3 @@ def delete_existing_data_basis(module):
 
 if __name__ == '__main__':
     add_data_basis()
-    #add_second_index()     #testing
