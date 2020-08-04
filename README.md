@@ -1,17 +1,17 @@
 # Matrix-Chatbot
 
 ## Table of contents
-1. [Perequisites](#perequisites)
-2. [Configuration](#configuration)
-3. [Setup}(#setup)
-4. [Architecture](#architecture)
-5. [Database scheme](#database scheme)
-6. [
-7. [NLP strategy](#nlp strategy)
-8. [License](#license)
+- [Perequisites](#perequisites)
+- [Configuration](#configuration)
+- [Setup](#setup)
+   - [E2EE support](#e2ee-support)   
+- [Architecture](#architecture)
+   - [Database schema](#database-schema)
+   - [Sequence diagram](#sequence-diagram)
+   - [NLP strategy](#nlp-strategy)
+- [License](#license)
 
-
-This natural language processing matrix-chatbot is designed for the messenger Element (previously named Riot.im) and is based on the matrix-nio client libary. The chatbot can be used as a digital learning assistant for students and answers lecture related questions with references to slides.
+This natural language processing matrix-chatbot is designed for the messenger [Element](https://github.com/vector-im/element-web) (previously named Riot.im) and is based on the matrix-nio client libary. The chatbot can be used as a digital learning assistant for students and answers lecture related questions with references to slides.
 Knowledge extension is achieved by simply adding new rules in predetermined files that serve as a data basis for the chatbot. The application offers a statistical overview of frequently asked topics, which can be queried directly via the chatbot.
 
 ## Perequisites
@@ -21,10 +21,11 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 - docker-compose
 
 ## Configuration
-- Create a new Element user account manually  [main.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/main.py) appropiately.
+- Create a new Element user account manually.
 - Customize the connection parameters of the database and Element account in [config.yaml](https://github.com/jquku/Matrix-Chatbot/blob/master/config.yaml)
-- To add chatbot knowledge of a new lecture script, change the URL, if necessary the URL prefix and add the module name all in [index_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/index_evaluation.py)
+- To add chatbot knowledge of a new lecture script, change the URL, if necessary the URL prefix and add the module name all in [index_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/index_evaluation.py).
 - To expand the chatbot's data basis, add new rules to [small_talk_evaluation.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/small_talk_evaluation.py) and [organisational_document.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/organisational_document.py).
+- For organisational documents also add the concerning module name in [organisational_document.py](https://github.com/jquku/Matrix-Chatbot/blob/master/modules/organisational_document.py).
 
 ## Setup
 1. Clone this repository and navigate into the repoistory folder
@@ -51,8 +52,8 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
 
 ### E2EE support
 The support is still a work in progress for the project. Messages sent to an encrypted room
-cannot be handlet yet. For future development, this is how matrix-nio with E2EE support can
-be downloaded.
+cannot be handled yet. For future development, this is how matrix-nio with E2EE support can
+be downloaded on Ubuntu.
 
 1. Install the latest version of python-olm
    For e2e support, installing the [libolm](https://gitlab.matrix.org/matrix-org/olm) C libary is recommended
@@ -69,7 +70,7 @@ be downloaded.
 The software architecture is modular and consists of seven modules.
 ![Modular software architecture](architecture.png)
 
-### Database scheme
+### Database schema
 Chabot data is being anonymized and stored in 7 tables in a relational PostgreSQL database. The database
 is accessible via docker container.
 ![Database scheme](schema.png)
