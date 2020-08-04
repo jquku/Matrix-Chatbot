@@ -12,7 +12,7 @@ text document consists of topic + response
 
 def add_organisation_document():
     '''adds an organisation document, adjust filepath accordingly'''
-    module = "Operating Systems (OS)"
+    module = "<module name>"    #add belonging module name here
     module = module.lower()
 
     document_name = "../knowledge_domains/organisation.txt"  #filepath

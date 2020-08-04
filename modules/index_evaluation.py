@@ -26,15 +26,15 @@ def list_to_string(topic):
 
 def add_data_basis():
     '''analyze web index and store into db'''
-    module = "<module name>"
+    module = "<module name>"    #add module name here
     module_original = module
     module = module.lower()
     module_in_db = check_if_domain_already_in_data_basis(module)
 
     if module_in_db == None:
 
-        url = "https://oer.gitlab.io/OS/index-terms.html"  #path of index
-        url_prefix = "https://oer.gitlab.io/OS/"
+        url = "<web index path>"  #add path of web index here
+        url_prefix = "<url prefix>" #add url prefix here if necessary, prefix can also be ""
         response = requests.get(url)
         soup = BeautifulSoup(response.text)
         links = soup.findAll('li')

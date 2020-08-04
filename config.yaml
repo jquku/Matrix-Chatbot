@@ -1,6 +1,6 @@
 matrix:
-  user_id: "@testbot123:matrix.org"
-  user_password: "testbot123"
+  user_id: "<full user matrix id>"
+  user_password: "<user password>"
   homeserver_url: "https://matrix.org"
 
 database:

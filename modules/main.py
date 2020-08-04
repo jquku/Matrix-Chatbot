@@ -106,7 +106,7 @@ async def message_cb(room, event):
             print("New message event: " + str(message_body))
             if check_if_user_is_existing(user_name) == False:
                 #create new user entry in db
-                create_new_user(user_name, "operating systems (os)")
+                create_new_user(user_name, "<module name>") #add name of inserted module
 
             #pass message to other modules
             processed_message = language_processing(message_body)
@@ -138,7 +138,7 @@ async def auto_join_room_cb(room, event):
 
     #create new user, room entry in db if not already existing
     if check_if_user_is_existing(user_name) == False:
-        create_new_user(hashed_user_name, "operating systems (os)")
+        create_new_user(hashed_user_name, "<module name>") #add name of inserted module
 
     if check_if_room_is_existing(room_id) == False:
         create_new_room(room_id, hashed_user_name)
