@@ -50,6 +50,7 @@ Knowledge extension is achieved by simply adding new rules in predetermined file
    ```console
    python3 main.py
 
+After starting the chatbot any user may be able to communicate with the bot. In the Element messenger, the chatbot can be added to a room via matrix ID.
 ### E2EE support
 The support is still a work in progress for the project. Messages sent to an encrypted room
 cannot be handled yet. For future development, this is how matrix-nio with E2EE support can
