@@ -11,7 +11,7 @@
    - [NLP strategy](#nlp-strategy)
 - [License](#license)
 
-This natural language processing matrix-chatbot is designed for the messenger [Element](https://github.com/vector-im/element-web) (previously named Riot.im) and is based on the [matrix-nio client libary](https://github.com/poljar/matrix-nio). The chatbot can be used as a digital learning assistant for students and answers lecture related questions with references to slides.
+This natural language processing matrix-chatbot is designed for the messenger [Element](https://github.com/vector-im/element-web) (previously named Riot.im) and is based on the [matrix-nio client libary](https://github.com/poljar/matrix-nio). The chatbot can be used as a digital learning assistant for students and answers lecture related questions with references to slides. The chatbot communicates in english and german.
 Knowledge extension is achieved by simply adding new rules in predetermined files that serve as a data basis for the chatbot. The application also offers a statistical overview of frequently asked topics, which can be queried directly via the chatbot.
 
 ## Perequisites

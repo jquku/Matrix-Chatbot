@@ -157,10 +157,7 @@ async def auto_join_room_cb(room, event):
 
         standard_first_message = "Hi, I'm your chatbot helping you with"\
             " whatever you need! Call 'help' to see all my options. I've"\
-            " information about the following modules: " + string_with_modules\
-            + ".\nHere are some exemplary topics you can ask about: Page tables"\
-            ", Memory allocation, Demand paging, Priority inheritance, Deadlock,"\
-            " Interrupt, Blocking."
+            " information about the following modules: " + string_with_modules
 
         await client.room_send(
             room_id=room_id,
